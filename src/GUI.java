@@ -111,7 +111,7 @@ public class GUI extends JFrame {
         clear_txt(groupname);
 
         // 이용 날짜를 입력받습니다.
-         JTextField starttime = new JTextField("시작 시간",6);
+        JTextField starttime = new JTextField("시작 시간",6);
         starttime.setSize(10,20);
         north.add(starttime, BorderLayout.WEST);
         clear_txt(starttime);
