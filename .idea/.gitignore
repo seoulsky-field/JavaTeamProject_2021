@@ -1,0 +1,10 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# 그룹/회원 정보 파일 깃헙에 올리지 않음 ( 텍스트 파일 올라가지 않음 )
+*.txt

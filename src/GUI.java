@@ -4,6 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.FileWriter;
+import java.util.ArrayList;
+
 
 public class GUI extends JFrame {
     public void main_gui() {
@@ -161,6 +164,41 @@ public class GUI extends JFrame {
         negative_yes.setVisible(false);
         negative_no.setVisible(false);
 
+        // arraylist 변수 그룹 생성
+        ArrayList<GroupMember> group = new ArrayList<>();
+
+        // check_list = {백신 접종 여부, 음성 확인서 여부}
+        String[] check_list = {"null", "null"};
+
+        // 백신 O 버튼을 눌렀을 시 리스너
+        vaccine_yes.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                check_list[0] = "true";
+            }
+        });
+        // 백신 X 버튼을 눌렀을 시 리스너
+        vaccine_no.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                check_list[0] = "false";
+            }
+        });
+        // 음성 확인서 O 버튼을 눌렀을 시 리스너
+        negative_yes.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                check_list[1] = "true";
+            }
+        });
+        // 음성 확인서 X 버튼을 눌렀을 시 리스너
+        negative_no.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                check_list[1] = "false";
+            }
+        });
+
         center.add(negative);
         center.add(negative_yes);
         center.add(negative_no);
@@ -181,29 +219,67 @@ public class GUI extends JFrame {
         BTN_addperson.setSize(30,30);
         south.add(BTN_addperson, BorderLayout.WEST);
 
-
-
         // 입력이 완료되면 저장하고 문자열을 초기화해야 합니다.
         // <<<<< 이 부분 문자 저장되는 거 코드 추가해주세요! >>>>>
         BTN_addperson.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e){
-//                arraylist로 저장해 return 해주시면 됩니다.
-//                if(값 중에서 공백이 하나라도 있을 경우에 해당하는 조건) {
-//                BTN_addperson.setText("정보 모두 입력!!");
-//                JFrame warning = new JFrame();
-//                warning.setSize(400, 0);
-//                warning.setTitle("정보를 모두 입력하세요!");
-//                warning.setVisible(true);
-//                BTN_addperson.setText("그룹원 추가하기");
-//                } else {
-                groupname.setText("그룹 이름");
-                starttime.setText("시작 시간");
-                endtime.setText("종료 시간");
-                person_name.setText("그룹원 이름");
-                birthday.setText("생년 월일 6자리를 입력하세요.");
-                address.setText("거주중인 주소를 입력하세요.");
-                // }
+                // 빈칸이 있을 경우 경고창 띄우기
+                if (groupname.getText().length() < 1) {
+//                    BTN_addperson.setText("정보 모두 입력!!");
+                    // 경고창 변경 필요
+                    JFrame warning = new JFrame();
+                    warning.setSize(400, 10);
+                    warning.setTitle("그룹원 정보를 입력하세요.");
+                    warning.setVisible(true);
+//                    BTN_addperson.setText("그룹원 추가하기");
+                } else if (starttime.getText().length() < 1) {
+                    JFrame warning = new JFrame();
+                    warning.setSize(400, 10);
+                    warning.setTitle("시작시간 정보를 입력하세요.");
+                    warning.setVisible(true);
+                } else if (endtime.getText().length() < 1) {
+                    JFrame warning = new JFrame();
+                    warning.setSize(400, 10);
+                    warning.setTitle("종료시간 정보를 입력하세요.");
+                    warning.setVisible(true);
+                } else if (person_name.getText().length() < 1) {
+                    JFrame warning = new JFrame();
+                    warning.setSize(400, 10);
+                    warning.setTitle("그룹원명 정보를 입력하세요.");
+                    warning.setVisible(true);
+                } else if (birthday.getText().length() < 1) {
+                    JFrame warning = new JFrame();
+                    warning.setSize(400, 10);
+                    warning.setTitle("생년월일 정보를 입력하세요.");
+                    warning.setVisible(true);
+                } else if (address.getText().length() < 1) {
+                    JFrame warning = new JFrame();
+                    warning.setSize(400, 10);
+                    warning.setTitle("주소 정보를 입력하세요.");
+                    warning.setVisible(true);
+                } else {
+                    String[] member = new String[8];
+                    //그룹명, 회원 이름, 백신 접종 여부, 음성 확인서 여부, 시작 시간, 종료 시간, 생년월일, 주소, 연락처
+                    member[0] = groupname.getText();
+                    member[1] = person_name.getText();
+                    member[2] = check_list[0];
+                    member[3] = check_list[1];
+                    member[4] = starttime.getText();
+                    member[5] = endtime.getText();
+                    member[6] = birthday.getText();
+                    member[7] = address.getText();
+                    group.add(new GroupMember(member));
+
+                    // 텍스트 초기화
+                    // 그룹명, 시작&종료 시간은 초기화 제외
+//                    groupname.setText("그룹 이름");
+//                    starttime.setText("시작 시간");
+//                    endtime.setText("종료 시간");
+                    person_name.setText("그룹원 이름");
+                    birthday.setText("생년 월일 6자리를 입력하세요.");
+                    address.setText("거주중인 주소를 입력하세요.");
+                }
             }
         });
 
@@ -217,10 +293,36 @@ public class GUI extends JFrame {
         BTN_endAddgroup.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // 그룹 정보 파일 만들기
+                // 양식 : 그룹명, 대표자명
+                String group_name = group.get(0).getGroupName();
+                String agent_name = group.get(0).getPersonName();
+                try (FileWriter fw = new FileWriter("그룹정보.txt", true)){ // 이어쓰기
+                    fw.write(group_name + "," + agent_name + "\r\n");
+                }catch(Exception err){
+                    err.printStackTrace();
+                }
+
+                // 회원 정보 파일 만들기
+                // 양식 : 그룹명, 회원 이름, 백신 접종 여부, 음성 확인서 여부, 시작 시간, 종료 시간, 생년월일, 주소
+                try (FileWriter fw = new FileWriter(group.get(0).getGroupName() + ".txt", false)){ // 덮어쓰기
+                    for (GroupMember member : group) {
+                        for (int i = 0; i < member.all_info.length; i++) {
+                            if (i == member.all_info.length -1)
+                                fw.write(member.all_info[i]);
+                            else
+                                fw.write(member.all_info[i]+",");
+                        }
+                        fw.write("\r\n");
+                    }
+                }catch(Exception err){
+                    err.printStackTrace();
+                }
+                
+                // 창 닫기
                 addFrame.dispose();
             }
         });
-
 
         addContainer.setVisible(true);
         addFrame.setVisible(true);
