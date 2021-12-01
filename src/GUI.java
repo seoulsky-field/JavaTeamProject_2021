@@ -455,7 +455,7 @@ public class GUI extends JFrame {
         JTextField groupname = new JTextField();
         JTextField starttime = new JTextField();
         JTextField endtime = new JTextField();
-        //
+        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
         ////////////////////////////////////////////////////////////////////////////
 
         // 그룹원 저장하기
@@ -590,6 +590,12 @@ public class GUI extends JFrame {
 
     //그룹 정보 조회
     public void group_information() {
+        ////////////////////////////////////////////////////////////////////////////
+        // 기존에는 조회 버튼을 클릭하면 조회가 되도록 하였습니다.
+        // 이제는 조회 버튼을 클릭하지 않아도 조회가 가능합니다. (처음 뜨는 창 변화로 인하여)
+        // 버튼에서의 기능은 주석으로 남겨두었습니다. 버튼만 삭제하였습니다.
+        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
+        ////////////////////////////////////////////////////////////////////////////
         JFrame infoFrame = new JFrame();
         infoFrame.setSize(800, 400);
         infoFrame.setTitle("그룹 정보를 입력하세요!");
@@ -611,21 +617,19 @@ public class GUI extends JFrame {
         infoContainer.add(south, BorderLayout.SOUTH);
 
         // GUI 상단에 대한 기능입니다.
-        JTextField groupname = new JTextField("그룹 이름", 10);
+        ////////////////////////////////////////////////////////////////////////////
+        // 초기 GUI를 수정하게 되면서 JTextField로 선언되어 있던 그룹 이름과 대표자 이름은
+        // JLabel로 수정되었습니다. 그에 맞게 해주시면 됩니다.
+        // 또한 password 입력받는 부분 완전히 삭제했습니다. 그에 맞게 해주시면 됩니다.
+        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
+        ////////////////////////////////////////////////////////////////////////////
+        JLabel groupname = new JLabel("그룹 이름", 10);
         groupname.setSize(10,20);
         north.add(groupname);
-        clear_txt(groupname);
 
-        JTextField leadername = new JTextField("대표자 이름", 6);
+        JLabel leadername = new JLabel("대표자 이름", 6);
         leadername.setSize(10,20);
         north.add(leadername);
-        clear_txt(leadername);
-
-        JTextField password = new JTextField("비밀번호 4자리", 9);
-        password.setSize(10,20);
-        north.add(password);
-        clear_txt(password);
-
 
         JLabel starttime = new JLabel("이용 시작 시간: ");
         north.add(starttime);
@@ -633,105 +637,88 @@ public class GUI extends JFrame {
         JLabel endtime = new JLabel("이용 종료 시간: ");
         north.add(endtime);
 
-        // 그룹이름, 대표자 이름, 비밀번호가 일치하면 버튼을 눌렀을때 그룹원들의 정보를 조회가 가능하게 합니다.
-        JButton BTN_show_information = new JButton();
-        BTN_show_information.setText("조회하기");
-        BTN_show_information.setSize(30,30);
-        south.add(BTN_show_information, BorderLayout.WEST);
-
-        BTN_show_information.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String gname = groupname.getText();
-                String lname = leadername.getText();
-                String pw = password.getText();
-
-                //빈 칸이 있을 경우
-                if (gname.length() < 1){
-                    JFrame warning = new JFrame();
-                    warning.setSize(400, 10);
-                    warning.setTitle("그룹명을 입력하세요.");
-                    warning.setVisible(true);
-                } else if(lname.length() < 1){
-                    JFrame warning = new JFrame();
-                    warning.setSize(400, 10);
-                    warning.setTitle("대표자 이름을 입력하세요.");
-                    warning.setVisible(true);
-                } else if(pw.length() < 4){
-                    JFrame warning = new JFrame();
-                    warning.setSize(400, 10);
-                    warning.setTitle("비밀번호를 입력하세요.");
-                    warning.setVisible(true);
-                } else {
-                    // 파일 읽어와서 그룹정보 txt 파일과 비교
-                    try (FileInputStream input = new FileInputStream(gname+".txt")){
-                        //TODO 함수화
-                        Scanner group_info = new Scanner(input);
-
-                        ArrayList <String[]> tmp_members = new ArrayList<>();
-                        while (group_info.hasNextLine()) {
-                            String[] line = group_info.nextLine().split(",");
-                            tmp_members.add(line);
-                        }
-                        // 테스트 출력
-//                        for (String[] member : members) {
-//                            for (String s : member) {
-//                                System.out.println(s);
+//                String gname = groupname.getText();
+//                String lname = leadername.getText();
+//
+//                //빈 칸이 있을 경우
+//                if (gname.length() < 1){
+//                    JFrame warning = new JFrame();
+//                    warning.setSize(400, 10);
+//                    warning.setTitle("그룹명을 입력하세요.");
+//                    warning.setVisible(true);
+//                } else if(lname.length() < 1){
+//                    JFrame warning = new JFrame();
+//                    warning.setSize(400, 10);
+//                    warning.setTitle("대표자 이름을 입력하세요.");
+//                    warning.setVisible(true);
+//                } else {
+//                    // 파일 읽어와서 그룹정보 txt 파일과 비교
+//                    try (FileInputStream input = new FileInputStream(gname+".txt")){
+//                        //TODO 함수화
+//                        Scanner group_info = new Scanner(input);
+//
+//                        ArrayList <String[]> tmp_members = new ArrayList<>();
+//                        while (group_info.hasNextLine()) {
+//                            String[] line = group_info.nextLine().split(",");
+//                            tmp_members.add(line);
+//                        }
+//                        // 테스트 출력
+////                        for (String[] member : members) {
+////                            for (String s : member) {
+////                                System.out.println(s);
+////                            }
+////                        }
+//                        // arrayList -> array 변환
+//                        String[] header = {"이름", "생년월일", "연락처", "주소", "백신 접종", "음성 확인서"};
+//                        String[][] members = new String[tmp_members.size()][header.length];
+//
+//                        for (int i = 0; i < tmp_members.size(); i++) {
+//                            for (int j = 0; j < header.length; j++) {
+//                                members[i][j] = tmp_members.get(i)[j];
 //                            }
 //                        }
-                        // arrayList -> array 변환
-                        String[] header = {"이름", "생년월일", "연락처", "주소", "백신 접종", "음성 확인서"};
-                        String[][] members = new String[tmp_members.size()][header.length];
-
-                        for (int i = 0; i < tmp_members.size(); i++) {
-                            for (int j = 0; j < header.length; j++) {
-                                members[i][j] = tmp_members.get(i)[j];
-                            }
-                        }
-
-                        starttime.setText(starttime.getText() + members[0][4]);
-                        endtime.setText(endtime.getText() + members[0][5]);
-
-                        DefaultTableModel model = new DefaultTableModel(members, header);
-                        JTable showMembers = new JTable(model);
-                        showMembers.setPreferredScrollableViewportSize(new Dimension(800, 200));
-
-                        // 셀 수정을 불가능하게 합니다.
-                        showMembers.setEnabled(false);
-
-                        // column들을 이동시키는 것과 표의 크기를 조절하는 것을 불가능하게 합니다.
-                        showMembers.getTableHeader().setReorderingAllowed(false);
-                        showMembers.getTableHeader().setResizingAllowed(false);
-                        //showMembers.setTableHeader(header);
-
-                        // 텍스트에 가운데 정렬을 적용합니다.
-                        DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
-                        dtcr.setHorizontalAlignment(SwingConstants.CENTER);
-                        TableColumnModel tcm = showMembers.getColumnModel();
-
-                        for (int i = 0; i < tcm.getColumnCount(); i++) {
-                            tcm.getColumn(i).setCellRenderer(dtcr);
-                        }
-
-                        // 단, column의 크기를 지정합니다.
-                        showMembers.getColumnModel().getColumn(0).setPreferredWidth(50);  // 이름 column
-                        showMembers.getColumnModel().getColumn(1).setPreferredWidth(50);  // 생년월일 column
-                        showMembers.getColumnModel().getColumn(2).setPreferredWidth(85);  // 연락처 column
-                        showMembers.getColumnModel().getColumn(3).setPreferredWidth(300);  // 주소 column
-                        showMembers.getColumnModel().getColumn(4).setPreferredWidth(50);  // 백신 접종 여부 column
-                        showMembers.getColumnModel().getColumn(5).setPreferredWidth(70);  // 음성 확인서 여부 column
-
-                        JScrollPane print = new JScrollPane(showMembers);
-                        print.setPreferredSize(new Dimension(800, 100));
-                        center.add(print);
-                    } catch (FileNotFoundException fileNotFoundException) {
-                        fileNotFoundException.printStackTrace();
-                    } catch (IOException ioException) {
-                        ioException.printStackTrace();
-                    }
-                }
-            }
-        });
+//
+//                        starttime.setText(starttime.getText() + members[0][4]);
+//                        endtime.setText(endtime.getText() + members[0][5]);
+//
+//                        DefaultTableModel model = new DefaultTableModel(members, header);
+//                        JTable showMembers = new JTable(model);
+//                        showMembers.setPreferredScrollableViewportSize(new Dimension(800, 200));
+//
+//                        // 셀 수정을 불가능하게 합니다.
+//                        showMembers.setEnabled(false);
+//
+//                        // column들을 이동시키는 것과 표의 크기를 조절하는 것을 불가능하게 합니다.
+//                        showMembers.getTableHeader().setReorderingAllowed(false);
+//                        showMembers.getTableHeader().setResizingAllowed(false);
+//                        //showMembers.setTableHeader(header);
+//
+//                        // 텍스트에 가운데 정렬을 적용합니다.
+//                        DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
+//                        dtcr.setHorizontalAlignment(SwingConstants.CENTER);
+//                        TableColumnModel tcm = showMembers.getColumnModel();
+//
+//                        for (int i = 0; i < tcm.getColumnCount(); i++) {
+//                            tcm.getColumn(i).setCellRenderer(dtcr);
+//                        }
+//
+//                        // 단, column의 크기를 지정합니다.
+//                        showMembers.getColumnModel().getColumn(0).setPreferredWidth(50);  // 이름 column
+//                        showMembers.getColumnModel().getColumn(1).setPreferredWidth(50);  // 생년월일 column
+//                        showMembers.getColumnModel().getColumn(2).setPreferredWidth(85);  // 연락처 column
+//                        showMembers.getColumnModel().getColumn(3).setPreferredWidth(300);  // 주소 column
+//                        showMembers.getColumnModel().getColumn(4).setPreferredWidth(50);  // 백신 접종 여부 column
+//                        showMembers.getColumnModel().getColumn(5).setPreferredWidth(70);  // 음성 확인서 여부 column
+//
+//                        JScrollPane print = new JScrollPane(showMembers);
+//                        print.setPreferredSize(new Dimension(800, 100));
+//                        center.add(print);
+//                    } catch (FileNotFoundException fileNotFoundException) {
+//                        fileNotFoundException.printStackTrace();
+//                    } catch (IOException ioException) {
+//                        ioException.printStackTrace();
+//                    }
+//                }
 
 
         // 그룹원 정보 출력과 관련한 기능입니다.
@@ -787,22 +774,22 @@ public class GUI extends JFrame {
         // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
         ////////////////////////////////////////////////////////////////////////////
         JLabel groupnameInfo = new JLabel("그룹 이름 : ", 10);
-        groupnameInfo.setSize(10,20);
+        groupnameInfo.setSize(10, 20);
         north.add(groupnameInfo);
 
         JLabel groupname = new JLabel("OO 그룹", 10);
-        groupname.setSize(10,20);
+        groupname.setSize(10, 20);
         north.add(groupname);
 
         JLabel timeInfo = new JLabel("    이용 시간 : ", 10);
-        timeInfo.setSize(10,20);
+        timeInfo.setSize(10, 20);
         north.add(timeInfo);
 
         JLabel starttime = new JLabel("10:00");
         north.add(starttime);
 
         JLabel justShow = new JLabel(" ~ ", 10);
-        justShow.setSize(5,20);
+        justShow.setSize(5, 20);
         north.add(justShow);
 
         JLabel endtime = new JLabel("19:00");
@@ -855,7 +842,7 @@ public class GUI extends JFrame {
         // GUI 하단에 대한 기능입니다. : 수정 완료 버튼
         JButton BTN_deletePerson = new JButton();
         BTN_deletePerson.setText("그룹원 한 명 탈퇴");
-        BTN_deletePerson.setSize(200,30);
+        BTN_deletePerson.setSize(200, 30);
         south.add(BTN_deletePerson, BorderLayout.EAST);
         BTN_deletePerson.addActionListener(new ActionListener() {
             @Override
@@ -868,7 +855,7 @@ public class GUI extends JFrame {
 
         JButton BTN_end_modify = new JButton();
         BTN_end_modify.setText("수정 완료");
-        BTN_end_modify.setSize(30,30);
+        BTN_end_modify.setSize(30, 30);
         south.add(BTN_end_modify, BorderLayout.EAST);
 
         BTN_end_modify.addActionListener(new ActionListener() {
@@ -956,215 +943,146 @@ public class GUI extends JFrame {
     // 그룹 삭제를 담당하는 함수
     public void group_delete() {
 
-        JFrame deleteFrame = new JFrame();
-        deleteFrame.setSize(300,200);
-        deleteFrame.setTitle("그룹 삭제 중 . . .");
-
-        Container delcontainer = deleteFrame.getContentPane();
-        delcontainer.setLayout(new BorderLayout());
-        delcontainer.setBackground(Color.lightGray);
-
-        JPanel north = new JPanel();
-        north.setBackground(Color.lightGray);
-        delcontainer.add(north, BorderLayout.NORTH);
-
-        JPanel center = new JPanel();
-        center.setBackground(Color.lightGray);
-        center.setLayout(new GridLayout(5,1));
-        delcontainer.add(center, BorderLayout.CENTER);
-
-        JPanel east = new JPanel();
-        east.setBackground(Color.lightGray);
-        delcontainer.add(east, BorderLayout.EAST);
-
-        JPanel west = new JPanel();
-        west.setBackground(Color.lightGray);
-        delcontainer.add(west, BorderLayout.WEST);
-
-        JPanel south = new JPanel();
-        south.setBackground(Color.lightGray);
-        delcontainer.add(south, BorderLayout.SOUTH);
-
-
-        // 그룹 이름을 입력받습니다.
-        JTextField groupname = new JTextField("그룹 이름", 10);
-        groupname.setHorizontalAlignment(JTextField.CENTER);
-        center.add(groupname);
-        clear_txt(groupname);
-
-
-        // 대표자 이름을 입력받습니다.
-        JTextField leadername = new JTextField("대표자 이름", 10);
-        leadername.setHorizontalAlignment(JTextField.CENTER);
-        center.add(leadername);
-        clear_txt(leadername);
-
-
-        // 비밀번호를 입력받습니다.
-        JTextField password = new JTextField("비밀번호 4자리", 10);
-        password.setHorizontalAlignment(JTextField.CENTER);
-        center.add(password);
-        clear_txt(password);
-
-        // 삭제하기 버튼
-        JButton BTN_delete = new JButton();
-        BTN_delete.setText("삭제하기");
-        BTN_delete.setSize(30,30);
-        center.add(BTN_delete);
-
-        // 삭제하기 취소 버튼
-        JButton BTN_cancel = new JButton();
-        BTN_cancel.setText("취소하기");
-        BTN_cancel.setSize(30,30);
-        center.add(BTN_cancel);
+        ////////////////////////////////////////////////////////////////////////////
+        // 기존에는 삭제 버튼을 클릭하면 여러 입력을 받고 확인을 받아 삭제하도록 하였습니다.
+        // 이제는 그룹 삭제 기능으로 넘어가면 확인창만 받고 삭제합니다.
+        // old GUI에서 사용되었던 기능은 주석으로 남겨두었습니다.
+        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
+        ////////////////////////////////////////////////////////////////////////////
 
         // 삭제하기 버튼 클릭 이벤트
-        BTN_delete.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String gname = groupname.getText();
-                String lname = leadername.getText();
-                String pw = password.getText();
-
-                try{
-                    int index = 0;
-                    // fileinputstream, scanner line 입력 받기 수정
-                    FileReader fileReader = new FileReader("그룹정보.txt");
-                    BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-                    String line = "";
-                    while((line = bufferedReader.readLine()) != null){
-                        String[] part = line.split(",");
-                        // groupMember로 변환
-                        // GroupMember gm = new GroupMember(line.split(","));
-                        // gm.getName();
-                        if(gname.equals(part[0]) && lname.equals(part[1])){
-                            JFrame deleteCheckFrame = new JFrame();
-                            deleteCheckFrame.setSize(280,110);
-                            deleteCheckFrame.setTitle("그룹 삭제");
-                            Container delCheckCon = deleteCheckFrame.getContentPane();
-                            delCheckCon.setLayout(new BorderLayout());
-                            delCheckCon.setBackground(Color.lightGray);
-
-                            JPanel center = new JPanel();
-                            center.setBackground(Color.lightGray);
-                            delCheckCon.add(center, BorderLayout.CENTER);
-
-                            JLabel really = new JLabel("정말 삭제하시겠습니까?");
-                            really.setSize(280, 50);
-                            really.setFont(new Font("gothic", Font.BOLD, 20));
-                            center.add(really);
-
-                            JButton BTN_yes = new JButton("네");
-                            BTN_yes.setSize(30,30);
-                            center.add(BTN_yes);
-                            BTN_yes.addActionListener(new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    deleteCheckFrame.dispose();
-                                    deleteFrame.dispose();
-                                    // 파일이 삭제되는 코드를 추가해주세요!!
-                                    String filename = gname + ".txt";
-                                    //그룹 정보 파일 읽고
-                                    try {
-                                        Files.delete(Path.of(filename));
-                                    } catch (IOException ex) {
-                                        ex.printStackTrace();
-                                    }
-
-                                }
-                            });
-
-                            JButton BTN_no = new JButton("아니오");
-                            BTN_no.setSize(30,30);
-                            center.add(BTN_no);
-                            BTN_no.addActionListener(new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    deleteCheckFrame.dispose();
-                                }
-                            });
-                            deleteCheckFrame.setVisible(true);
-                            break;
-
-                        }else{
-                            index ++;
-                            deleteFrame.setTitle("입력 " + index + "회 오류입니다.");
-                            groupname.setText("그룹 이름");
-                            leadername.setText("대표자 이름");
-                            password.setText("비밀번호 4자리");
-                        }
-                    }
-
-                } catch (FileNotFoundException fileNotFoundException) {
-                    fileNotFoundException.printStackTrace();
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
-                }
+//        String gname = groupname.getText();
+//        String lname = leadername.getText();
+//        String pw = password.getText();
+//
+//        try {
+//            int index = 0;
+//            // fileinputstream, scanner line 입력 받기 수정
+//            FileReader fileReader = new FileReader("그룹정보.txt");
+//            BufferedReader bufferedReader = new BufferedReader(fileReader);
+//
+//            String line = "";
+//            while ((line = bufferedReader.readLine()) != null) {
+//                String[] part = line.split(",");
+//                // groupMember로 변환
+//                // GroupMember gm = new GroupMember(line.split(","));
+//                // gm.getName();
+//                if (gname.equals(part[0]) && lname.equals(part[1])) {
+//                    JFrame deleteCheckFrame = new JFrame();
+//                    deleteCheckFrame.setSize(280, 110);
+//                    deleteCheckFrame.setTitle("그룹 삭제");
+//                    Container delCheckCon = deleteCheckFrame.getContentPane();
+//                    delCheckCon.setLayout(new BorderLayout());
+//                    delCheckCon.setBackground(Color.lightGray);
+//
+//                    JPanel center = new JPanel();
+//                    center.setBackground(Color.lightGray);
+//                    delCheckCon.add(center, BorderLayout.CENTER);
+//
+//                    JLabel really = new JLabel("정말 삭제하시겠습니까?");
+//                    really.setSize(280, 50);
+//                    really.setFont(new Font("gothic", Font.BOLD, 20));
+//                    center.add(really);
+//
+//                    JButton BTN_yes = new JButton("네");
+//                    BTN_yes.setSize(30, 30);
+//                    center.add(BTN_yes);
+//                    BTN_yes.addActionListener(new ActionListener() {
+//                        @Override
+//                        public void actionPerformed(ActionEvent e) {
+//                            deleteCheckFrame.dispose();
+//                            deleteFrame.dispose();
+//                            // 파일이 삭제되는 코드를 추가해주세요!!
+//                            String filename = gname + ".txt";
+//                            //그룹 정보 파일 읽고
+//                            try {
+//                                Files.delete(Path.of(filename));
+//                            } catch (IOException ex) {
+//                                ex.printStackTrace();
+//                            }
+//
+//                        }
+//                    });
+//
+//                    JButton BTN_no = new JButton("아니오");
+//                    BTN_no.setSize(30, 30);
+//                    center.add(BTN_no);
+//                    BTN_no.addActionListener(new ActionListener() {
+//                        @Override
+//                        public void actionPerformed(ActionEvent e) {
+//                            deleteCheckFrame.dispose();
+//                        }
+//                    });
+//                    deleteCheckFrame.setVisible(true);
+//                    break;
+//
+//                } else {
+//                    index++;
+//                    deleteFrame.setTitle("입력 " + index + "회 오류입니다.");
+//                    groupname.setText("그룹 이름");
+//                    leadername.setText("대표자 이름");
+//                    password.setText("비밀번호 4자리");
+//                }
+//            }
+//
+//        } catch (FileNotFoundException fileNotFoundException) {
+//            fileNotFoundException.printStackTrace();
+//        } catch (IOException ioException) {
+//            ioException.printStackTrace();
+//        }
 
 
-                //
-                // 조건문으로 삭제 조건(그룹 이름, 대표자 이름, 비밀번호가 모두 맞는지를 확인하는 코드 작성 부탁드립니다!!
-                //
-                // 조건이 틀렸다면 아래의 코드를 실행해주세요. index 추가 코드도 작성해주세요.
+        //
+        // 조건문으로 삭제 조건(그룹 이름, 대표자 이름, 비밀번호가 모두 맞는지를 확인하는 코드 작성 부탁드립니다!!
+        //
+        // 조건이 틀렸다면 아래의 코드를 실행해주세요. index 추가 코드도 작성해주세요.
 //                deleteFrame.setTitle("입력 " + index + "회 오류입니다.");
 //                groupname.setText("그룹 이름");
 //                leadername.setText("대표자 이름");
 //                password.setText("비밀번호 4자리");
-                // 조건이 맞았다면 아래의 코드를 실행해주세요.
-                JFrame deleteCheckFrame = new JFrame();
-                deleteCheckFrame.setSize(280,110);
-                deleteCheckFrame.setTitle("그룹 삭제");
-                Container delCheckCon = deleteCheckFrame.getContentPane();
-                delCheckCon.setLayout(new BorderLayout());
-                delCheckCon.setBackground(Color.lightGray);
+        // 조건이 맞았다면 아래의 코드를 실행해주세요.
+        JFrame deleteCheckFrame = new JFrame();
+        deleteCheckFrame.setSize(280, 110);
+        deleteCheckFrame.setTitle("그룹 삭제");
+        Container delCheckCon = deleteCheckFrame.getContentPane();
+        delCheckCon.setLayout(new BorderLayout());
+        delCheckCon.setBackground(Color.lightGray);
 
-                JPanel center = new JPanel();
-                center.setBackground(Color.lightGray);
-                delCheckCon.add(center, BorderLayout.CENTER);
+        JPanel center = new JPanel();
+        center.setBackground(Color.lightGray);
+        delCheckCon.add(center, BorderLayout.CENTER);
 
-                JLabel really = new JLabel("정말 삭제하시겠습니까?");
-                really.setSize(280, 50);
-                really.setFont(new Font("gothic", Font.BOLD, 20));
-                center.add(really);
+        JLabel really = new JLabel("정말 삭제하시겠습니까?");
+        really.setSize(280, 50);
+        really.setFont(new Font("gothic", Font.BOLD, 20));
+        center.add(really);
 
-                JButton BTN_yes = new JButton("네");
-                BTN_yes.setSize(30,30);
-                center.add(BTN_yes);
-                BTN_yes.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        deleteCheckFrame.dispose();
-                        deleteFrame.dispose();
-                        func_gui();
-                    }
-                });
-
-                JButton BTN_no = new JButton("아니오");
-                BTN_no.setSize(30,30);
-                center.add(BTN_no);
-                BTN_no.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        deleteCheckFrame.dispose();
-                    }
-                });
-                deleteCheckFrame.setVisible(true);
-            }
-        });
-
-        // 삭제 취소 버튼을 누를시 그룹 삭제 창이 사라지게 하는 액션리스너
-        BTN_cancel.addActionListener(new ActionListener() {
+        JButton BTN_yes = new JButton("네");
+        BTN_yes.setSize(30, 30);
+        center.add(BTN_yes);
+        BTN_yes.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                deleteFrame.dispose();
+                ////////////////////////////////////////////////////////////////////////////
+                // 삭제 기능을 여기다가 구현하시면 됩니다.
+                // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
+                ////////////////////////////////////////////////////////////////////////////
+                deleteCheckFrame.dispose();
                 func_gui();
             }
         });
 
-
-        deleteFrame.setVisible(true);
-        deleteFrame.requestFocusInWindow();
+        JButton BTN_no = new JButton("아니오");
+        BTN_no.setSize(30, 30);
+        center.add(BTN_no);
+        BTN_no.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                deleteCheckFrame.dispose();
+                func_gui();
+            }
+        });
+        deleteCheckFrame.setVisible(true);
     }
 
     // 최종 보고서를 출력하는 함수
