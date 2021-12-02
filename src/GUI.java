@@ -2,16 +2,23 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Scanner;
-
+import java.util.Objects;
 
 public class GUI extends JFrame {
+    Logic logic = new Logic();
+    String last_group_name;
+    String last_agent_name;
+    String[] header = {"이름", "생년월일", "연락처", "주소", "백신 접종", "음성 확인서"};
+    String levelName = "1";
+    String facilityName = "스터디 카페";
+
     public void main_gui() {
         setSize(300, 200);
         setTitle("초기 화면 수정");
@@ -57,18 +64,16 @@ public class GUI extends JFrame {
         });
 
         // 그룹 이름을 입력받습니다.
-        JTextField groupname = new JTextField("그룹 이름", 10);
-        groupname.setHorizontalAlignment(JTextField.CENTER);
-        center.add(groupname);
-        clear_txt(groupname);
-
+        JTextField group_name = new JTextField("그룹 이름", 10);
+        group_name.setHorizontalAlignment(JTextField.CENTER);
+        center.add(group_name);
+        clear_txt(group_name);
 
         // 대표자 이름을 입력받습니다.
-        JTextField leadername = new JTextField("대표자 이름", 10);
-        leadername.setHorizontalAlignment(JTextField.CENTER);
-        center.add(leadername);
-        clear_txt(leadername);
-
+        JTextField leader_name = new JTextField("대표자 이름", 10);
+        leader_name.setHorizontalAlignment(JTextField.CENTER);
+        center.add(leader_name);
+        clear_txt(leader_name);
 
         // 비밀번호를 입력받습니다.
         JTextField password = new JTextField("비밀번호 4자리", 10);
@@ -76,25 +81,39 @@ public class GUI extends JFrame {
         center.add(password);
         clear_txt(password);
 
-
         // 입력 확인 버튼 - 입력한 정보가 이미 존재하고 그 정보와 일치하면 group_main 화면 출력
         JButton BTN_accept = new JButton();
         BTN_accept.setText("입력 확인");
         BTN_accept.setSize(30, 30);
         center.add(BTN_accept);
 
-        // 조건문 형식으로 입력한 정보와 일치하는지 판단 후에 일치하다면 group_main 화면 출력하는 기능 구현 필요
         BTN_accept.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                func_gui();
-                dispose();
+                // 그룹 정보 파일 대조
+                try {
+                    String[] line = logic.getGroupInfo(group_name.getText(), password.getText());
+                    last_group_name = line[0];
+                    last_agent_name = logic.getAgent_name(group_name.getText());
+
+                    func_gui();
+                    dispose();
+                } catch (FileNotFoundException err) {
+                    setTitle("지정된 파일을 찾을 수 없습니다.");
+                } catch (NullPointerException err) {
+                    setTitle("그룹 정보를 다시 입력하세요.");
+                }
+
+                group_name.setText("그룹 이름");
+                leader_name.setText("대표자 이름");
+                password.setText("비밀번호 4자리");
+
             }
         });
-
         setVisible(true);
     }
 
+    // 기능 선택하기
     public void func_gui() {
         // GUI 크기 및 타이틀 설정
         JFrame funcFrame = new JFrame();
@@ -121,18 +140,13 @@ public class GUI extends JFrame {
         south.setBackground(Color.lightGray);
         funcContainer.add(south, BorderLayout.SOUTH);
 
-        ////////////////////////////////////////////////////////////////////////////
-        // groupname과 leadername 정보를 파일에서 불러와주세요.
-        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-        ////////////////////////////////////////////////////////////////////////////
-
         // 그룹 이름을 받아와서 출력
-        JLabel groupname = new JLabel("그룹 이름: ");
-        north.add(groupname);
+        JLabel group_name = new JLabel("그룹 이름: "+last_group_name);
+        north.add(group_name);
 
         // 대표자 이름을 받아와서 출력
-        JLabel leadername = new JLabel("대표자 이름: ");
-        north.add(leadername);
+        JLabel leader_name = new JLabel("대표자 이름: "+last_agent_name);
+        north.add(leader_name);
 
         // 그룹 정보를 조회하는 버튼 관련 GUI 처리 코드
         JButton BTN_group_show = new JButton();
@@ -145,7 +159,7 @@ public class GUI extends JFrame {
 
         center.add(BTN_group_show);
 
-        // 그룹 정보 출력 버튼을 클릭했을 때 해당 GUI로 이동함.
+        // 그룹 정보 조회 버튼을 클릭했을 때 해당 GUI로 이동함.
         BTN_group_show.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e){
@@ -223,7 +237,6 @@ public class GUI extends JFrame {
         south.add(BTN_endprogram);
 
         BTN_endprogram.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 funcFrame.dispose();
@@ -238,7 +251,6 @@ public class GUI extends JFrame {
         south.add(BTN_goto_maingui);
 
         BTN_goto_maingui.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 funcFrame.dispose();
@@ -249,11 +261,14 @@ public class GUI extends JFrame {
         funcFrame.setVisible(true);
     }
 
+    // 그룹 추가하기
     public void group_add() {
+        // frame 설정
         JFrame groupAddFrame = new JFrame();
         groupAddFrame.setSize(400, 200);
-        groupAddFrame.setTitle("그룹 정보 입력 중");
+        groupAddFrame.setTitle("그룹 정보 추가");
 
+        // container 처리
         Container groupAddContainer = groupAddFrame.getContentPane();
         groupAddContainer.setLayout(new BorderLayout());
 
@@ -282,23 +297,24 @@ public class GUI extends JFrame {
         center_south.setBackground(Color.lightGray);
         center_south.setLayout(new GridLayout(1,2));
 
+        // 그룹명 입력받기
+        JTextField group_name = new JTextField("그룹 이름",6);
+        group_name.setSize(10,20);
+        center.add(group_name);
+        clear_txt(group_name);
 
-        JTextField groupname = new JTextField("그룹 이름",6);
-        groupname.setSize(10,20);
-        center.add(groupname);
-        clear_txt(groupname);
+        // 이용시간 입력받기
+        JTextField start_time = new JTextField("시작 시간(ex, 11:00)",6);
+        start_time.setSize(10,20);
+        center.add(start_time);
+        clear_txt(start_time);
 
-        // 이용 날짜를 입력받습니다.
-        JTextField starttime = new JTextField("시작 시간",6);
-        starttime.setSize(10,20);
-        center.add(starttime);
-        clear_txt(starttime);
+        JTextField end_time = new JTextField("종료 시간(ex, 13:00)",6);
+        end_time.setSize(10,20);
+        center.add(end_time);
+        clear_txt(end_time);
 
-        JTextField endtime = new JTextField("종료 시간",6);
-        endtime.setSize(10,20);
-        center.add(endtime);
-        clear_txt(endtime);
-
+        // 비밀번호 입력받기
         JTextField password = new JTextField("비밀번호 4자리 설정",6);
         password.setSize(10,20);
         center.add(password);
@@ -306,18 +322,33 @@ public class GUI extends JFrame {
 
         center.add(center_south);
 
-        JButton BTN_addgrouppeople = new JButton("그룹원 추가하기");
+        // 그룹원 추가하기 버튼 눌렀을 때 리스너 처리
+        JButton BTN_addgrouppeople = new JButton("그룹원 추가");
         center_south.add(BTN_addgrouppeople);
 
         BTN_addgrouppeople.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                groupAddFrame.dispose();
-                people_add();
-
+                // 빈칸 처리
+                if (Objects.equals(group_name.getText(), "그룹 이름")) {
+                    groupAddFrame.setTitle("그룹명을 입력하세요.");
+                } else if (Objects.equals(start_time.getText(), "시작 시간(ex, 11:00)")) {
+                    groupAddFrame.setTitle("시작시간을 입력하세요.");
+                } else if (Objects.equals(end_time.getText(), "종료 시간(ex, 13:00)")) {
+                    groupAddFrame.setTitle("종료시간을 입력하세요.");
+                } else if (password.getText().length() != 4 || Objects.equals(password.getText(), "비밀번호 4자리 설정")) {
+                    groupAddFrame.setTitle("비밀번호를 입력하세요.");
+                }
+                else { // 그룹 정보 텍스트 파일 생성
+                    logic.createGroupInfo(group_name.getText(), start_time.getText(), end_time.getText(), password.getText());
+                    groupAddFrame.dispose();
+                    people_add(group_name.getText());
+                }
             }
         });
-        JButton BTN_canclegroupadd = new JButton("취소하기");
+
+        // 취소하기 버튼 눌렀을 때 리스너 처리
+        JButton BTN_canclegroupadd = new JButton("취소");
         center_south.add(BTN_canclegroupadd);
 
         BTN_canclegroupadd.addActionListener(new ActionListener() {
@@ -325,7 +356,6 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 groupAddFrame.dispose();
                 setVisible(true);
-
             }
         });
         groupAddFrame.setVisible(true);
@@ -333,7 +363,7 @@ public class GUI extends JFrame {
     }
 
     // 그룹 추가를 담당하는 함수
-    public void people_add() {
+    public void people_add(String group_name) {
         JFrame addFrame = new JFrame();
         addFrame.setSize(400, 200);
         addFrame.setTitle("그룹 추가 진행 중");
@@ -354,7 +384,7 @@ public class GUI extends JFrame {
         addContainer.add(south, BorderLayout.SOUTH);
 
         // 그룹원 이름을 입력받습니다.
-        JTextField person_name = new JTextField("그룹원 이름", 7);
+        JTextField person_name = new JTextField("회원 이름", 7);
         center.add(person_name);
         clear_txt(person_name);
 
@@ -450,12 +480,9 @@ public class GUI extends JFrame {
         ////////////////////////////////////////////////////////////////////////////
         // 비밀번호 4자리 생성 관련 TextField를 추가하였습니다.
         // 해당 기능과 관련하여 아래 구현하셨던 기능에 비밀번호 관련 기능을 추가해주세요.
-        // 또한 그룹 추가 창을 요청하신대로 분리하였습니다. 아래 groupname과 time 관련해서 수정해주세요.
+        // 또한 그룹 추가 창을 요청하신대로 분리하였습니다. 아래 group_name 과 time 관련해서 수정해주세요.
         // 이 코드는 에러 방지를 위해 작성된 "임의의" 코드입니다.
-        JTextField groupname = new JTextField();
-        JTextField starttime = new JTextField();
-        JTextField endtime = new JTextField();
-        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
+        //
         ////////////////////////////////////////////////////////////////////////////
 
         // 그룹원 저장하기
@@ -477,46 +504,37 @@ public class GUI extends JFrame {
                 warning.add(showMessage);
 
                 warning.setSize(400, 100);
-                if (groupname.getText().length() < 1) {
-                    showMessage.setText("그룹 이름 정보를 입력하세요.");
-                    warning.setVisible(true);
-                } else if (starttime.getText().length() < 1) {
-                    showMessage.setText("시작시간 정보를 입력하세요.");
-                    warning.setVisible(true);
-                } else if (endtime.getText().length() < 1) {
-                    showMessage.setText("종료시간 정보를 입력하세요.");
-                    warning.setVisible(true);
-                } else if (person_name.getText().length() < 1) {
+                // TODO setText() 가 맞는지 확인 필요
+                if (Objects.equals(person_name.getText(), "회원 이름")) {
                     showMessage.setText("그룹원 이름 정보를 입력하세요.");
                     warning.setVisible(true);
-                } else if (birthday.getText().length() < 6) {
+                } else if (Objects.equals(birthday.getText(), "생년 월일 6자리")) {
                     showMessage.setText("생년월일 정보를 입력하세요.");
                     warning.setVisible(true);
-                } else if (phoneNumber.getText().length() <10){
+                } else if (Objects.equals(phoneNumber.getText(), "전화번호(-제외)")){
                     showMessage.setText("핸드폰 번호를 입력하세요.");
                     warning.setVisible(true);
-                } else if (address.getText().length() < 1) {
+                } else if (Objects.equals(address.getText(), "거주중인 주소")) {
                     showMessage.setText("주소 정보를 입력하세요.");
                     warning.setVisible(true);
                 } else {
-                    String[] member = new String[9];
-                    //그룹명, 회원 이름, 백신 접종 여부, 음성 확인서 여부, 시작 시간, 종료 시간, 생년월일, 핸드폰 번호, 주소
-                    member[0] = groupname.getText();
-                    member[1] = person_name.getText();
-                    member[2] = check_list[0];
-                    member[3] = check_list[1];
-                    member[4] = starttime.getText();
-                    member[5] = endtime.getText();
-                    member[6] = birthday.getText();
-                    member[7] = phoneNumber.getText();
-                    member[8] = address.getText();
+                    String[] member = new String[6];
+                    // 회원이름,생년월일,연락처,주소,백신접종,음성확인서
+                    member[0] = person_name.getText();
+                    member[1] = birthday.getText();
+                    member[2] = phoneNumber.getText();
+                    member[3] = address.getText();
+                    member[4] = check_list[0];
+                    member[5] = check_list[1];
                     group.add(new GroupMember(member));
 
                     // 텍스트 초기화
                     person_name.setText("그룹원 이름");
                     birthday.setText("생년 월일 6자리를 입력하세요.");
                     address.setText("거주중인 주소를 입력하세요.");
+                    phoneNumber.setText("핸드폰 번호를 입력하세요.");
 
+                    // 음성 확인서 숨기기
                     negative.setVisible(false);
                     negative_yes.setVisible(false);
                     negative_no.setVisible(false);
@@ -534,31 +552,9 @@ public class GUI extends JFrame {
         BTN_endAddgroup.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // 그룹 정보 파일 만들기
-                // 양식 : 그룹명, 대표자명
-                String group_name = group.get(0).getGroupName();
-                String agent_name = group.get(0).getPersonName();
-                try (FileWriter fw = new FileWriter("그룹정보.txt", true)){ // 이어쓰기
-                    fw.write(group_name + "," + agent_name + "\r\n");
-                }catch(Exception err){
-                    err.printStackTrace();
-                }
-
                 // 회원 정보 파일 만들기
-                // 양식 : 그룹명, 회원 이름, 백신 접종 여부, 음성 확인서 여부, 시작 시간, 종료 시간, 생년월일, 주소
-                try (FileWriter fw = new FileWriter(group.get(0).getGroupName() + ".txt", false)){ // 덮어쓰기
-                    for (GroupMember member : group) {
-                        for (int i = 0; i < member.all_info.length; i++) {
-                            if (i == member.all_info.length -1)
-                                fw.write(member.all_info[i]);
-                            else
-                                fw.write(member.all_info[i]+",");
-                        }
-                        fw.write("\r\n");
-                    }
-                }catch(Exception err){
-                    err.printStackTrace();
-                }
+                // 양식 : 이름,생년월일,연락처,주소,백신접종,음성확인서
+                logic.createMemberInfo(group_name, group);
 
                 // 창 닫기
                 addFrame.dispose();
@@ -588,14 +584,7 @@ public class GUI extends JFrame {
         });
     }
 
-    //그룹 정보 조회
     public void group_information() {
-        ////////////////////////////////////////////////////////////////////////////
-        // 기존에는 조회 버튼을 클릭하면 조회가 되도록 하였습니다.
-        // 이제는 조회 버튼을 클릭하지 않아도 조회가 가능합니다. (처음 뜨는 창 변화로 인하여)
-        // 버튼에서의 기능은 주석으로 남겨두었습니다. 버튼만 삭제하였습니다.
-        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-        ////////////////////////////////////////////////////////////////////////////
         JFrame infoFrame = new JFrame();
         infoFrame.setSize(800, 400);
         infoFrame.setTitle("그룹 정보를 입력하세요!");
@@ -617,116 +606,54 @@ public class GUI extends JFrame {
         infoContainer.add(south, BorderLayout.SOUTH);
 
         // GUI 상단에 대한 기능입니다.
-        ////////////////////////////////////////////////////////////////////////////
-        // 초기 GUI를 수정하게 되면서 JTextField로 선언되어 있던 그룹 이름과 대표자 이름은
-        // JLabel로 수정되었습니다. 그에 맞게 해주시면 됩니다.
-        // 또한 password 입력받는 부분 완전히 삭제했습니다. 그에 맞게 해주시면 됩니다.
-        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-        ////////////////////////////////////////////////////////////////////////////
-        JLabel groupname = new JLabel("그룹 이름", 10);
-        groupname.setSize(10,20);
+        JLabel groupname = new JLabel("그룹 이름: "+ last_group_name);
         north.add(groupname);
 
-        JLabel leadername = new JLabel("대표자 이름", 6);
-        leadername.setSize(10,20);
+        JLabel leadername = new JLabel("대표자 이름: "+ last_agent_name);
         north.add(leadername);
 
-        JLabel starttime = new JLabel("이용 시작 시간: ");
+        JLabel starttime = new JLabel("이용 시작 시간: "+ logic.getTimeInfo(last_group_name)[0]);
         north.add(starttime);
 
-        JLabel endtime = new JLabel("이용 종료 시간: ");
+        JLabel endtime = new JLabel("이용 종료 시간: "+ logic.getTimeInfo(last_group_name)[1]);
         north.add(endtime);
 
-//                String gname = groupname.getText();
-//                String lname = leadername.getText();
-//
-//                //빈 칸이 있을 경우
-//                if (gname.length() < 1){
-//                    JFrame warning = new JFrame();
-//                    warning.setSize(400, 10);
-//                    warning.setTitle("그룹명을 입력하세요.");
-//                    warning.setVisible(true);
-//                } else if(lname.length() < 1){
-//                    JFrame warning = new JFrame();
-//                    warning.setSize(400, 10);
-//                    warning.setTitle("대표자 이름을 입력하세요.");
-//                    warning.setVisible(true);
-//                } else {
-//                    // 파일 읽어와서 그룹정보 txt 파일과 비교
-//                    try (FileInputStream input = new FileInputStream(gname+".txt")){
-//                        //TODO 함수화
-//                        Scanner group_info = new Scanner(input);
-//
-//                        ArrayList <String[]> tmp_members = new ArrayList<>();
-//                        while (group_info.hasNextLine()) {
-//                            String[] line = group_info.nextLine().split(",");
-//                            tmp_members.add(line);
-//                        }
-//                        // 테스트 출력
-////                        for (String[] member : members) {
-////                            for (String s : member) {
-////                                System.out.println(s);
-////                            }
-////                        }
-//                        // arrayList -> array 변환
-//                        String[] header = {"이름", "생년월일", "연락처", "주소", "백신 접종", "음성 확인서"};
-//                        String[][] members = new String[tmp_members.size()][header.length];
-//
-//                        for (int i = 0; i < tmp_members.size(); i++) {
-//                            for (int j = 0; j < header.length; j++) {
-//                                members[i][j] = tmp_members.get(i)[j];
-//                            }
-//                        }
-//
-//                        starttime.setText(starttime.getText() + members[0][4]);
-//                        endtime.setText(endtime.getText() + members[0][5]);
-//
-//                        DefaultTableModel model = new DefaultTableModel(members, header);
-//                        JTable showMembers = new JTable(model);
-//                        showMembers.setPreferredScrollableViewportSize(new Dimension(800, 200));
-//
-//                        // 셀 수정을 불가능하게 합니다.
-//                        showMembers.setEnabled(false);
-//
-//                        // column들을 이동시키는 것과 표의 크기를 조절하는 것을 불가능하게 합니다.
-//                        showMembers.getTableHeader().setReorderingAllowed(false);
-//                        showMembers.getTableHeader().setResizingAllowed(false);
-//                        //showMembers.setTableHeader(header);
-//
-//                        // 텍스트에 가운데 정렬을 적용합니다.
-//                        DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
-//                        dtcr.setHorizontalAlignment(SwingConstants.CENTER);
-//                        TableColumnModel tcm = showMembers.getColumnModel();
-//
-//                        for (int i = 0; i < tcm.getColumnCount(); i++) {
-//                            tcm.getColumn(i).setCellRenderer(dtcr);
-//                        }
-//
-//                        // 단, column의 크기를 지정합니다.
-//                        showMembers.getColumnModel().getColumn(0).setPreferredWidth(50);  // 이름 column
-//                        showMembers.getColumnModel().getColumn(1).setPreferredWidth(50);  // 생년월일 column
-//                        showMembers.getColumnModel().getColumn(2).setPreferredWidth(85);  // 연락처 column
-//                        showMembers.getColumnModel().getColumn(3).setPreferredWidth(300);  // 주소 column
-//                        showMembers.getColumnModel().getColumn(4).setPreferredWidth(50);  // 백신 접종 여부 column
-//                        showMembers.getColumnModel().getColumn(5).setPreferredWidth(70);  // 음성 확인서 여부 column
-//
-//                        JScrollPane print = new JScrollPane(showMembers);
-//                        print.setPreferredSize(new Dimension(800, 100));
-//                        center.add(print);
-//                    } catch (FileNotFoundException fileNotFoundException) {
-//                        fileNotFoundException.printStackTrace();
-//                    } catch (IOException ioException) {
-//                        ioException.printStackTrace();
-//                    }
-//                }
+        String[][] members = logic.getMemberInfo(last_group_name, header);
 
 
-        // 그룹원 정보 출력과 관련한 기능입니다.
-        // 현재는 예시 데이터로 입력되어 있습니다. 이차원 배열의 형태로 값을 불러오도록 해주세요!!
+        DefaultTableModel model = new DefaultTableModel(members, header);
+        JTable showMembers = new JTable(model);
+        showMembers.setPreferredScrollableViewportSize(new Dimension(800, 200));
 
-        // 백신 접종 여부가 O일 경우에는 음성 확인서 접종 여부
+        // 셀 수정을 불가능하게 합니다.
+        showMembers.setEnabled(false);
 
-        // GUI 하단에 대한 기능입니다.
+        // column들을 이동시키는 것과 표의 크기를 조절하는 것을 불가능하게 합니다.
+        showMembers.getTableHeader().setReorderingAllowed(false);
+        showMembers.getTableHeader().setResizingAllowed(false);
+        //showMembers.setTableHeader(header);
+
+        // 텍스트에 가운데 정렬을 적용합니다.
+        DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
+        dtcr.setHorizontalAlignment(SwingConstants.CENTER);
+        TableColumnModel tcm = showMembers.getColumnModel();
+
+        for (int i = 0; i < tcm.getColumnCount(); i++) {
+            tcm.getColumn(i).setCellRenderer(dtcr);
+        }
+
+        // 단, column의 크기를 지정합니다.
+        showMembers.getColumnModel().getColumn(0).setPreferredWidth(50);  // 이름 column
+        showMembers.getColumnModel().getColumn(1).setPreferredWidth(50);  // 생년월일 column
+        showMembers.getColumnModel().getColumn(2).setPreferredWidth(85);  // 연락처 column
+        showMembers.getColumnModel().getColumn(3).setPreferredWidth(300);  // 주소 column
+        showMembers.getColumnModel().getColumn(4).setPreferredWidth(50);  // 백신 접종 여부 column
+        showMembers.getColumnModel().getColumn(5).setPreferredWidth(70);  // 음성 확인서 여부 column
+
+        JScrollPane print = new JScrollPane(showMembers);
+        print.setPreferredSize(new Dimension(800, 100));
+        center.add(print);
+
         JButton BTN_end_information = new JButton();
         BTN_end_information.setText("조회 완료");
         BTN_end_information.setSize(30,30);
@@ -768,45 +695,30 @@ public class GUI extends JFrame {
         modiContainer.add(south, BorderLayout.SOUTH);
 
         // GUI 상단에 대한 기능입니다. : 그룹 이름, 이용 시작 시간, 이용 종료 시간
-        ////////////////////////////////////////////////////////////////////////////
-        // groupname과 starttime, endtime의 정보를 파일에서 불러와주세요.
-        // 00 그룹, 10:00, 19:00 이 적혀 있는 부분에 추가해주시면 됩니다.
-        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-        ////////////////////////////////////////////////////////////////////////////
-        JLabel groupnameInfo = new JLabel("그룹 이름 : ", 10);
-        groupnameInfo.setSize(10, 20);
-        north.add(groupnameInfo);
+        JLabel group_nameInfo = new JLabel("그룹 이름 : ", 10);
+        group_nameInfo.setSize(10,20);
+        north.add(group_nameInfo);
 
-        JLabel groupname = new JLabel("OO 그룹", 10);
-        groupname.setSize(10, 20);
-        north.add(groupname);
+        JLabel group_name = new JLabel(last_group_name, 10);
+        group_name.setSize(10,20);
+        north.add(group_name);
 
         JLabel timeInfo = new JLabel("    이용 시간 : ", 10);
-        timeInfo.setSize(10, 20);
+        timeInfo.setSize(10,20);
         north.add(timeInfo);
 
-        JLabel starttime = new JLabel("10:00");
+        JLabel starttime = new JLabel(logic.getTimeInfo(last_group_name)[0]);
         north.add(starttime);
 
         JLabel justShow = new JLabel(" ~ ", 10);
-        justShow.setSize(5, 20);
+        justShow.setSize(5,20);
         north.add(justShow);
 
-        JLabel endtime = new JLabel("19:00");
+        JLabel endtime = new JLabel(logic.getTimeInfo(last_group_name)[1]);
         north.add(endtime);
 
         // GUI 중앙에 대한 기능입니다. : 그룹원 정보 출력
-        ////////////////////////////////////////////////////////////////////////////
-        // test data입니다. 파일에서 불러와 주세요.
-        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-        ////////////////////////////////////////////////////////////////////////////
-        String[] header = {"이름", "생년월일", "연락처", "주소", "백신 접종", "음성 확인서"};
-        String[][] members = {{"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"}};
+        String[][] members = logic.getMemberInfo(last_group_name, header);
 
         DefaultTableModel model = new DefaultTableModel(members, header);
         JTable showMembers = new JTable(model);
@@ -839,10 +751,10 @@ public class GUI extends JFrame {
         print.setPreferredSize(new Dimension(800, 100));
         center.add(print);
 
-        // GUI 하단에 대한 기능입니다. : 수정 완료 버튼
+        // GUI 하단에 대한 기능입니다.
         JButton BTN_deletePerson = new JButton();
-        BTN_deletePerson.setText("그룹원 한 명 탈퇴");
-        BTN_deletePerson.setSize(200, 30);
+        BTN_deletePerson.setText("회원 삭제");
+        BTN_deletePerson.setSize(200,30);
         south.add(BTN_deletePerson, BorderLayout.EAST);
         BTN_deletePerson.addActionListener(new ActionListener() {
             @Override
@@ -855,17 +767,32 @@ public class GUI extends JFrame {
 
         JButton BTN_end_modify = new JButton();
         BTN_end_modify.setText("수정 완료");
-        BTN_end_modify.setSize(30, 30);
+        BTN_end_modify.setSize(30,30);
         south.add(BTN_end_modify, BorderLayout.EAST);
 
         BTN_end_modify.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                ArrayList<String> updatedMembers = new ArrayList<>();
+                TableModel model = showMembers.getModel();
+                for(int idx=0; idx<model.getRowCount(); idx++) {
+                    String rows = "";
+
+                    for(int cdx=0; cdx<model.getColumnCount(); cdx++) {
+                        Object val = model.getValueAt(idx, cdx);
+                        if (rows.length() < 1) {
+                            rows = rows + val;
+                        } else {
+                            rows = rows + "," + val;
+                        }
+                    }
+                    updatedMembers.add(rows);
+                }
+                logic.createMemberInfo2(last_group_name, updatedMembers);
                 modiFrame.dispose();
                 func_gui();
             }
         });
-
         modiFrame.pack();
         modiFrame.setVisible(true);
         modiFrame.requestFocusInWindow();
@@ -912,10 +839,13 @@ public class GUI extends JFrame {
         BTN_deleteProcess.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ////////////////////////////////////////////////////////////////////////////
-                // 그룹원 한 명을 파일에서 완전히 삭제해주세요.
-                // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-                ////////////////////////////////////////////////////////////////////////////
+                ArrayList<String[]> dummy = new ArrayList<>();
+                String[][] members = logic.getMemberInfo(last_group_name, header);
+                for(String[] s : members) {
+                    if (!Objects.equals(personName.getText(), s[0]) && !Objects.equals(personPhone.getText(), s[2]))
+                        dummy.add(s);
+                }
+                logic.createMemberInfo3(last_group_name, dummy);
                 deletePeople.dispose();
                 group_modify();
             }
@@ -942,105 +872,6 @@ public class GUI extends JFrame {
 
     // 그룹 삭제를 담당하는 함수
     public void group_delete() {
-
-        ////////////////////////////////////////////////////////////////////////////
-        // 기존에는 삭제 버튼을 클릭하면 여러 입력을 받고 확인을 받아 삭제하도록 하였습니다.
-        // 이제는 그룹 삭제 기능으로 넘어가면 확인창만 받고 삭제합니다.
-        // old GUI에서 사용되었던 기능은 주석으로 남겨두었습니다.
-        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-        ////////////////////////////////////////////////////////////////////////////
-
-        // 삭제하기 버튼 클릭 이벤트
-//        String gname = groupname.getText();
-//        String lname = leadername.getText();
-//        String pw = password.getText();
-//
-//        try {
-//            int index = 0;
-//            // fileinputstream, scanner line 입력 받기 수정
-//            FileReader fileReader = new FileReader("그룹정보.txt");
-//            BufferedReader bufferedReader = new BufferedReader(fileReader);
-//
-//            String line = "";
-//            while ((line = bufferedReader.readLine()) != null) {
-//                String[] part = line.split(",");
-//                // groupMember로 변환
-//                // GroupMember gm = new GroupMember(line.split(","));
-//                // gm.getName();
-//                if (gname.equals(part[0]) && lname.equals(part[1])) {
-//                    JFrame deleteCheckFrame = new JFrame();
-//                    deleteCheckFrame.setSize(280, 110);
-//                    deleteCheckFrame.setTitle("그룹 삭제");
-//                    Container delCheckCon = deleteCheckFrame.getContentPane();
-//                    delCheckCon.setLayout(new BorderLayout());
-//                    delCheckCon.setBackground(Color.lightGray);
-//
-//                    JPanel center = new JPanel();
-//                    center.setBackground(Color.lightGray);
-//                    delCheckCon.add(center, BorderLayout.CENTER);
-//
-//                    JLabel really = new JLabel("정말 삭제하시겠습니까?");
-//                    really.setSize(280, 50);
-//                    really.setFont(new Font("gothic", Font.BOLD, 20));
-//                    center.add(really);
-//
-//                    JButton BTN_yes = new JButton("네");
-//                    BTN_yes.setSize(30, 30);
-//                    center.add(BTN_yes);
-//                    BTN_yes.addActionListener(new ActionListener() {
-//                        @Override
-//                        public void actionPerformed(ActionEvent e) {
-//                            deleteCheckFrame.dispose();
-//                            deleteFrame.dispose();
-//                            // 파일이 삭제되는 코드를 추가해주세요!!
-//                            String filename = gname + ".txt";
-//                            //그룹 정보 파일 읽고
-//                            try {
-//                                Files.delete(Path.of(filename));
-//                            } catch (IOException ex) {
-//                                ex.printStackTrace();
-//                            }
-//
-//                        }
-//                    });
-//
-//                    JButton BTN_no = new JButton("아니오");
-//                    BTN_no.setSize(30, 30);
-//                    center.add(BTN_no);
-//                    BTN_no.addActionListener(new ActionListener() {
-//                        @Override
-//                        public void actionPerformed(ActionEvent e) {
-//                            deleteCheckFrame.dispose();
-//                        }
-//                    });
-//                    deleteCheckFrame.setVisible(true);
-//                    break;
-//
-//                } else {
-//                    index++;
-//                    deleteFrame.setTitle("입력 " + index + "회 오류입니다.");
-//                    groupname.setText("그룹 이름");
-//                    leadername.setText("대표자 이름");
-//                    password.setText("비밀번호 4자리");
-//                }
-//            }
-//
-//        } catch (FileNotFoundException fileNotFoundException) {
-//            fileNotFoundException.printStackTrace();
-//        } catch (IOException ioException) {
-//            ioException.printStackTrace();
-//        }
-
-
-        //
-        // 조건문으로 삭제 조건(그룹 이름, 대표자 이름, 비밀번호가 모두 맞는지를 확인하는 코드 작성 부탁드립니다!!
-        //
-        // 조건이 틀렸다면 아래의 코드를 실행해주세요. index 추가 코드도 작성해주세요.
-//                deleteFrame.setTitle("입력 " + index + "회 오류입니다.");
-//                groupname.setText("그룹 이름");
-//                leadername.setText("대표자 이름");
-//                password.setText("비밀번호 4자리");
-        // 조건이 맞았다면 아래의 코드를 실행해주세요.
         JFrame deleteCheckFrame = new JFrame();
         deleteCheckFrame.setSize(280, 110);
         deleteCheckFrame.setTitle("그룹 삭제");
@@ -1063,12 +894,10 @@ public class GUI extends JFrame {
         BTN_yes.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ////////////////////////////////////////////////////////////////////////////
-                // 삭제 기능을 여기다가 구현하시면 됩니다.
-                // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-                ////////////////////////////////////////////////////////////////////////////
+                logic.deleteGroupinfo(last_group_name);
+                logic.deleteMemberinfo(last_group_name);
                 deleteCheckFrame.dispose();
-                func_gui();
+                main_gui();
             }
         });
 
@@ -1078,6 +907,7 @@ public class GUI extends JFrame {
         BTN_no.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                logic.btn_no();
                 deleteCheckFrame.dispose();
                 func_gui();
             }
@@ -1106,20 +936,30 @@ public class GUI extends JFrame {
 
         JPanel center_north = new JPanel();
         center_north.setBackground(Color.lightGray);
-        center_north.setLayout(new BorderLayout());
+        center_north.setLayout(new FlowLayout());
         center.add(center_north, BorderLayout.NORTH);
+
+        JPanel center_center = new JPanel();
+        center_center.setBackground(Color.lightGray);
+        center_center.setLayout(new BorderLayout());
+        center.add(center_center, BorderLayout.CENTER);
+
+        JPanel center_south = new JPanel();
+        center_south.setBackground(Color.lightGray);
+        center_south.setLayout(new BorderLayout());
+        center.add(center_south, BorderLayout.SOUTH);
 
         JPanel south = new JPanel();
         south.setBackground(Color.lightGray);
         printContainer.add(south, BorderLayout.SOUTH);
 
-        JLabel groupname = new JLabel("그룹이름 : ");
-        groupname.setBackground(Color.white);
-        groupname.setOpaque(true);
-        north.add(groupname);
+        JLabel group_name = new JLabel("그룹이름 : ");
+        group_name.setBackground(Color.white);
+        group_name.setOpaque(true);
+        north.add(group_name);
 
-        JLabel leadername = new JLabel("대표자 이름 : ");
-        north.add(leadername);
+        JLabel leader_name = new JLabel("대표자 이름 : ");
+        north.add(leader_name);
 
         JLabel starttime = new JLabel("이용 시작 시간 : ");
         north.add(starttime);
@@ -1127,17 +967,105 @@ public class GUI extends JFrame {
         JLabel endtime = new JLabel("이용 마침 시간 : ");
         north.add(endtime);
 
-        ////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////
         // 현행 규정과 통계 관련해서 코드를 모두 작성하고 변수에 알맞게 대입해주세요.
         // 모임이 가능한지와 불가능한지 또한 판정하는 코드를 작성 후 변수에 대입해주세요.
         // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-        ////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////
+
+        JLabel level = new JLabel("현재 거리두기 단계 : ");
+        center_north.add(level);
+
+        String[] levels = {"1", "2", "3", "4"};
+        JComboBox<String> CB_level = new JComboBox<>(levels);
+        center_north.add(CB_level);
+
+        JLabel facility = new JLabel("방문 예정 시설 : ");
+        center_north.add(facility);
+
+        String socialDist[] = {"스터디 카페","식당","PC방"};
+        JComboBox<String> facilityShow = new JComboBox<>(socialDist);
+        center_north.add(facilityShow);
 
         //아래 str1에 현행 규정 입력하기 <br>은 줄바꿈 문자임
-        String str1 = "================현행규정================<br>"+ "거리두기 ~~단계<br>"+"운영시간 - 제한 없음<br>"+ "테이블간 거리두기 ~~~<br>"+ "최대 ~인 제한<br>";
+        String str1 = "================현행규정================<br>"+ "거리두기 단계<br>"+"운영시간 - 제한 없음<br>"+ "테이블간 거리두기 ~~~<br>"+ "최대 ~인 제한<br>";
 
-        JLabel rule = new JLabel("<HTML><body style ='text-align:center;'>"+str1 +"</body></HTML>",JLabel.CENTER);
-        center_north.add(rule,BorderLayout.NORTH);
+        JLabel rule = new JLabel("<HTML><body style ='text-align:center;'>"+str1 + "</body></HTML>",JLabel.CENTER);
+        center_center.add(rule,BorderLayout.NORTH);
+
+        ////////////////////////////////////////////////////////////////////////////
+        // 단계를 입력 받고, 시설을 입력 받았을 때의 setText를 지정해주시면 됩니다.
+        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
+        ////////////////////////////////////////////////////////////////////////////
+
+        CB_level.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                levelName = (String)CB_level.getSelectedItem();
+                if(levelName == "1" && facilityName == "스터디 카페") {
+                    rule.setText("1단계이면서 스터디 카페일 때 출력하는 현행 조건");
+                }else if(levelName == "1" && facilityName == "식당") {
+                    rule.setText("1단계이면서 식당일 때 출력하는 현행 조건");
+                }else if(levelName == "1" && facilityName == "PC방") {
+                    rule.setText("1단계이면서 PC방 일 때 출력하는 현행 조건");
+                }else if(levelName == "2" && facilityName == "스터디 카페") {
+                    rule.setText("2단계이면서 스터디카페 일 때 출력하는 현행 조건");
+                }else if(levelName == "2" && facilityName == "식당") {
+                    rule.setText("2단계이면서 식당 일 때 출력하는 현행 조건");
+                }else if(levelName == "2" && facilityName == "PC방") {
+                    rule.setText("2단계이면서 PC방 일 때 출력하는 현행 조건");
+                }else if(levelName == "3" && facilityName == "스터디 카페") {
+                    rule.setText("3단계이면서 스터디카페 일 때 출력하는 현행 조건");
+                }else if(levelName == "3" && facilityName == "식당") {
+                    rule.setText("3단계이면서 식당 일 때 출력하는 현행 조건");
+                }else if(levelName == "3" && facilityName == "PC방") {
+                    rule.setText("3단계이면서 PC방 일 때 출력하는 현행 조건");
+                }else if(levelName == "4" && facilityName == "스터디 카페") {
+                    rule.setText("4단계이면서 스터디 카페 일 때 출력하는 현행 조건");
+                }else if(levelName == "4" && facilityName == "식당") {
+                    rule.setText("4단계이면서 식당 일 때 출력하는 현행 조건");
+                }else {
+                    rule.setText("4단계이면서 PC방 일 때 출력하는 현행 조건");
+                }
+            }
+        });
+
+        facilityShow.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                facilityName = (String) facilityShow.getSelectedItem();
+                if(levelName == "1" && facilityName == "스터디 카페") {
+                    rule.setText("1단계이면서 스터디 카페일 때 출력하는 현행 조건");
+                }else if(levelName == "1" && facilityName == "식당") {
+                    rule.setText("1단계이면서 식당일 때 출력하는 현행 조건");
+                }else if(levelName == "1" && facilityName == "PC방") {
+                    rule.setText("1단계이면서 PC방 일 때 출력하는 현행 조건");
+                }else if(levelName == "2" && facilityName == "스터디 카페") {
+                    rule.setText("2단계이면서 스터디카페 일 때 출력하는 현행 조건");
+                }else if(levelName == "2" && facilityName == "식당") {
+                    rule.setText("2단계이면서 식당 일 때 출력하는 현행 조건");
+                }else if(levelName == "2" && facilityName == "PC방") {
+                    rule.setText("2단계이면서 PC방 일 때 출력하는 현행 조건");
+                }else if(levelName == "3" && facilityName == "스터디 카페") {
+                    rule.setText("3단계이면서 스터디카페 일 때 출력하는 현행 조건");
+                }else if(levelName == "3" && facilityName == "식당") {
+                    rule.setText("3단계이면서 식당 일 때 출력하는 현행 조건");
+                }else if(levelName == "3" && facilityName == "PC방") {
+                    rule.setText("3단계이면서 PC방 일 때 출력하는 현행 조건");
+                }else if(levelName == "4" && facilityName == "스터디 카페") {
+                    rule.setText("4단계이면서 스터디 카페 일 때 출력하는 현행 조건");
+                }else if(levelName == "4" && facilityName == "식당") {
+                    rule.setText("4단계이면서 식당 일 때 출력하는 현행 조건");
+                }else {
+                    rule.setText("4단계이면서 PC방 일 때 출력하는 현행 조건");
+                }
+            }
+        });
+
+        ////////////////////////////////////////////////////////////////////////////
+        // 백신 접종 관련한 조건문 통해서 변수에 값을 집어넣어 주세요.
+        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
+        ////////////////////////////////////////////////////////////////////////////
 
         //백신 접종 통계를 위해 아래 변수에 수 집어넣기
         int vaccine_O = 0;
@@ -1146,12 +1074,17 @@ public class GUI extends JFrame {
 
         JLabel statistics = new JLabel("<HTML><body style ='text-align:center;'>"+"================통계자료================<br>"
                 +"(백신 접종 여부 : O("+vaccine_O+"명), X("+vaccine_X+"명/ 음성확인서 : "+negative+") " +"</body></HTML>", JLabel.CENTER);
-        center_north.add(statistics,BorderLayout.CENTER);
+        center_center.add(statistics,BorderLayout.CENTER);
+
+        ////////////////////////////////////////////////////////////////////////////
+        // 최종 판정 조건 해주세요.
+        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
+        ////////////////////////////////////////////////////////////////////////////
 
         // 현행 규정과 비교해서 현재 그룹의 모임이 가능한지 불가능한지를 판정 후 출력
         String finalJudgement = "※최종 판정 :";
         JLabel judgement = new JLabel(finalJudgement, JLabel.CENTER);
-        center_north.add(judgement,BorderLayout.SOUTH);
+        center_center.add(judgement,BorderLayout.SOUTH);
 
 
         // GUI 중앙에 대한 기능입니다. : 그룹원 정보 출력
@@ -1159,11 +1092,8 @@ public class GUI extends JFrame {
         // test data입니다. 파일에서 불러와 주세요.
         // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
         ////////////////////////////////////////////////////////////////////////////
-        String[] header = {"이름", "생년월일", "연락처", "주소", "백신 접종", "음성 확인서"};
+
         String[][] members = {{"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
                 {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
                 {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
                 {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
@@ -1181,7 +1111,8 @@ public class GUI extends JFrame {
         DefaultTableModel model = new DefaultTableModel(members, header);
         JTable showMembers = new JTable(model);
         showMembers.setPreferredScrollableViewportSize(new Dimension(800, members.length * 17));
-        printFrame.setSize(800,250 + members.length * 17);
+        center_south.setSize(new Dimension(800, (members.length+2) * 17));
+        printFrame.setSize(800,300 + center_south.getHeight());
 
         // 셀 수정을 불가능하게 합니다.
         showMembers.setEnabled(false);
@@ -1208,8 +1139,8 @@ public class GUI extends JFrame {
         showMembers.setRowHeight(17);
 
         JScrollPane print = new JScrollPane(showMembers);
-        print.setPreferredSize(new Dimension(800, members.length * 17));
-        center.add(print);
+        print.setPreferredSize(new Dimension(800, 25 + members.length * 17));
+        center_south.add(print);
 
 
         // GUI 하단 : 인쇄하기 버튼과 창 닫기 버튼
