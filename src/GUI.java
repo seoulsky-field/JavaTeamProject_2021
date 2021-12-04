@@ -16,12 +16,13 @@ public class GUI extends JFrame {
     String last_group_name;
     String last_agent_name;
     String[] header = {"이름", "생년월일", "연락처", "주소", "백신 접종", "음성 확인서"};
+    String ruleString = "================현행규정================<br>"+ "거리두기 1단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
     String levelName = "1";
     String facilityName = "스터디 카페";
 
     public void main_gui() {
         setSize(300, 200);
-        setTitle("초기 화면 수정");
+        setTitle("초기 화면");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Container mainContainer = getContentPane();
@@ -118,7 +119,7 @@ public class GUI extends JFrame {
         // GUI 크기 및 타이틀 설정
         JFrame funcFrame = new JFrame();
         funcFrame.setSize(400, 200);
-        funcFrame.setTitle("백신");
+        funcFrame.setTitle("메인 화면");
         funcFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // container 설정
@@ -267,6 +268,7 @@ public class GUI extends JFrame {
         JFrame groupAddFrame = new JFrame();
         groupAddFrame.setSize(400, 200);
         groupAddFrame.setTitle("그룹 정보 추가");
+        groupAddFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // container 처리
         Container groupAddContainer = groupAddFrame.getContentPane();
@@ -367,6 +369,7 @@ public class GUI extends JFrame {
         JFrame addFrame = new JFrame();
         addFrame.setSize(400, 200);
         addFrame.setTitle("그룹 추가 진행 중");
+        addFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Container addContainer = addFrame.getContentPane();
         addContainer.setLayout(new BorderLayout());
@@ -588,6 +591,7 @@ public class GUI extends JFrame {
         JFrame infoFrame = new JFrame();
         infoFrame.setSize(800, 400);
         infoFrame.setTitle("그룹 정보를 입력하세요!");
+        infoFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Container infoContainer = infoFrame.getContentPane();
         infoContainer.setLayout(new BorderLayout());
@@ -677,6 +681,7 @@ public class GUI extends JFrame {
         JFrame modiFrame = new JFrame();
         modiFrame.setSize(800, 400);
         modiFrame.setTitle("그룹 정보 수정");
+        modiFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Container modiContainer = modiFrame.getContentPane();
         modiContainer.setLayout(new BorderLayout());
@@ -802,6 +807,7 @@ public class GUI extends JFrame {
     public void person_delete() {
         JFrame deletePeople = new JFrame();
         deletePeople.setSize(400,100);
+        deletePeople.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Container delPeoContainer = deletePeople.getContentPane();
         delPeoContainer.setLayout(new BorderLayout());
@@ -875,6 +881,8 @@ public class GUI extends JFrame {
         JFrame deleteCheckFrame = new JFrame();
         deleteCheckFrame.setSize(280, 110);
         deleteCheckFrame.setTitle("그룹 삭제");
+        deleteCheckFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         Container delCheckCon = deleteCheckFrame.getContentPane();
         delCheckCon.setLayout(new BorderLayout());
         delCheckCon.setBackground(Color.lightGray);
@@ -919,6 +927,7 @@ public class GUI extends JFrame {
     public void report_print() {
         JFrame printFrame = new JFrame();
         printFrame.setTitle("최종 보고서 출력");
+        printFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Container printContainer = printFrame.getContentPane();
         printContainer.setLayout(new BorderLayout());
@@ -987,45 +996,50 @@ public class GUI extends JFrame {
         JComboBox<String> facilityShow = new JComboBox<>(socialDist);
         center_north.add(facilityShow);
 
-        //아래 str1에 현행 규정 입력하기 <br>은 줄바꿈 문자임
-        String str1 = "================현행규정================<br>"+ "거리두기 단계<br>"+"운영시간 - 제한 없음<br>"+ "테이블간 거리두기 ~~~<br>"+ "최대 ~인 제한<br>";
 
-        JLabel rule = new JLabel("<HTML><body style ='text-align:center;'>"+str1 + "</body></HTML>",JLabel.CENTER);
+        JLabel rule = new JLabel("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>",JLabel.CENTER);
         center_center.add(rule,BorderLayout.NORTH);
-
-        ////////////////////////////////////////////////////////////////////////////
-        // 단계를 입력 받고, 시설을 입력 받았을 때의 setText를 지정해주시면 됩니다.
-        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-        ////////////////////////////////////////////////////////////////////////////
 
         CB_level.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 levelName = (String)CB_level.getSelectedItem();
                 if(levelName == "1" && facilityName == "스터디 카페") {
-                    rule.setText("1단계이면서 스터디 카페일 때 출력하는 현행 조건");
+                    ruleString ="================현행규정================<br>"+ "거리두기 1단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "1" && facilityName == "식당") {
-                    rule.setText("1단계이면서 식당일 때 출력하는 현행 조건");
+                    ruleString ="================현행규정================<br>"+ "거리두기 1단계<br>"+"운영시간 - 제한 없음<br>"+ "테이블간 1m 거리두기 또는 좌석/테이블 간 한 칸 띄우기 또는 테이블 간 칸막이 설치<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "1" && facilityName == "PC방") {
-                    rule.setText("1단계이면서 PC방 일 때 출력하는 현행 조건");
+                    ruleString ="================현행규정================<br>"+ "거리두기 1단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "2" && facilityName == "스터디 카페") {
-                    rule.setText("2단계이면서 스터디카페 일 때 출력하는 현행 조건");
+                    ruleString = "================현행규정================<br>"+ "거리두기 2단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "2" && facilityName == "식당") {
-                    rule.setText("2단계이면서 식당 일 때 출력하는 현행 조건");
+                    ruleString = "================현행규정================<br>"+ "거리두기 2단계<br>"+"운영시간 - 24시 이후 포장, 배달만 허용<br>"+ "테이블간 1m 거리두기 또는 좌석/테이블 간 한 칸 띄우기 또는 테이블 간 칸막이 설치<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "2" && facilityName == "PC방") {
-                    rule.setText("2단계이면서 PC방 일 때 출력하는 현행 조건");
+                    ruleString ="================현행규정================<br>"+ "거리두기 2단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "3" && facilityName == "스터디 카페") {
-                    rule.setText("3단계이면서 스터디카페 일 때 출력하는 현행 조건");
+                    ruleString ="================현행규정================<br>"+ "거리두기 3단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "3" && facilityName == "식당") {
-                    rule.setText("3단계이면서 식당 일 때 출력하는 현행 조건");
+                    ruleString = "================현행규정================<br>"+ "거리두기 3단계<br>"+"운영시간 - 22시 이후 포장, 배달만 허용<br>"+ "테이블간 1m 거리두기 또는 좌석/테이블 간 한 칸 띄우기 또는 테이블 간 칸막이 설치<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "3" && facilityName == "PC방") {
-                    rule.setText("3단계이면서 PC방 일 때 출력하는 현행 조건");
+                    ruleString ="================현행규정================<br>"+ "거리두기 3단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "4" && facilityName == "스터디 카페") {
-                    rule.setText("4단계이면서 스터디 카페 일 때 출력하는 현행 조건");
+                    ruleString = "================현행규정================<br>"+ "거리두기 4단계<br>"+"운영시간 - 22시 이후 운영제한<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "4" && facilityName == "식당") {
-                    rule.setText("4단계이면서 식당 일 때 출력하는 현행 조건");
+                    ruleString = "================현행규정================<br>"+ "거리두기 4단계<br>"+"운영시간 - 21시 이후 포장, 배달만 허용<br>"+ "테이블간 1m 거리두기 또는 좌석/테이블 간 한 칸 띄우기 또는 테이블 간 칸막이 설치<br>"+ "예방접종 완료자를 추가하는 경우 18시 이후 4인까지 사적 모임 가능<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else {
-                    rule.setText("4단계이면서 PC방 일 때 출력하는 현행 조건");
+                    ruleString ="================현행규정================<br>"+ "거리두기 4단계<br>"+"운영시간 - 22시 이후 운영 제한<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }
             }
         });
@@ -1035,29 +1049,41 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 facilityName = (String) facilityShow.getSelectedItem();
                 if(levelName == "1" && facilityName == "스터디 카페") {
-                    rule.setText("1단계이면서 스터디 카페일 때 출력하는 현행 조건");
+                    ruleString ="================현행규정================<br>"+ "거리두기 1단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "1" && facilityName == "식당") {
-                    rule.setText("1단계이면서 식당일 때 출력하는 현행 조건");
+                    ruleString ="================현행규정================<br>"+ "거리두기 1단계<br>"+"운영시간 - 제한 없음<br>"+ "테이블간 1m 거리두기 또는 좌석/테이블 간 한 칸 띄우기 또는 테이블 간 칸막이 설치<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "1" && facilityName == "PC방") {
-                    rule.setText("1단계이면서 PC방 일 때 출력하는 현행 조건");
+                    ruleString ="================현행규정================<br>"+ "거리두기 1단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "2" && facilityName == "스터디 카페") {
-                    rule.setText("2단계이면서 스터디카페 일 때 출력하는 현행 조건");
+                    ruleString = "================현행규정================<br>"+ "거리두기 2단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "2" && facilityName == "식당") {
-                    rule.setText("2단계이면서 식당 일 때 출력하는 현행 조건");
+                    ruleString = "================현행규정================<br>"+ "거리두기 2단계<br>"+"운영시간 - 24시 이후 포장, 배달만 허용<br>"+ "테이블간 1m 거리두기 또는 좌석/테이블 간 한 칸 띄우기 또는 테이블 간 칸막이 설치<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "2" && facilityName == "PC방") {
-                    rule.setText("2단계이면서 PC방 일 때 출력하는 현행 조건");
+                    ruleString ="================현행규정================<br>"+ "거리두기 2단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "3" && facilityName == "스터디 카페") {
-                    rule.setText("3단계이면서 스터디카페 일 때 출력하는 현행 조건");
+                    ruleString ="================현행규정================<br>"+ "거리두기 3단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "3" && facilityName == "식당") {
-                    rule.setText("3단계이면서 식당 일 때 출력하는 현행 조건");
+                    ruleString = "================현행규정================<br>"+ "거리두기 3단계<br>"+"운영시간 - 22시 이후 포장, 배달만 허용<br>"+ "테이블간 1m 거리두기 또는 좌석/테이블 간 한 칸 띄우기 또는 테이블 간 칸막이 설치<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "3" && facilityName == "PC방") {
-                    rule.setText("3단계이면서 PC방 일 때 출력하는 현행 조건");
+                    ruleString ="================현행규정================<br>"+ "거리두기 3단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "4" && facilityName == "스터디 카페") {
-                    rule.setText("4단계이면서 스터디 카페 일 때 출력하는 현행 조건");
+                    ruleString = "================현행규정================<br>"+ "거리두기 4단계<br>"+"운영시간 - 22시 이후 운영제한<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else if(levelName == "4" && facilityName == "식당") {
-                    rule.setText("4단계이면서 식당 일 때 출력하는 현행 조건");
+                    ruleString = "================현행규정================<br>"+ "거리두기 4단계<br>"+"운영시간 - 21시 이후 포장, 배달만 허용<br>"+ "테이블간 1m 거리두기 또는 좌석/테이블 간 한 칸 띄우기 또는 테이블 간 칸막이 설치<br>"+ "예방접종 완료자를 추가하는 경우 18시 이후 4인까지 사적 모임 가능<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }else {
-                    rule.setText("4단계이면서 PC방 일 때 출력하는 현행 조건");
+                    ruleString ="================현행규정================<br>"+ "거리두기 4단계<br>"+"운영시간 - 22시 이후 운영 제한<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
                 }
             }
         });
