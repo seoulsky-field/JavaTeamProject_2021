@@ -905,7 +905,6 @@ public class GUI extends JFrame {
         BTN_no.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                logic.btn_no();
                 deleteCheckFrame.dispose();
                 func_gui();
             }
@@ -941,18 +940,18 @@ public class GUI extends JFrame {
         south.setBackground(Color.lightGray);
         printContainer.add(south, BorderLayout.SOUTH);
 
-        JLabel group_name = new JLabel("그룹이름 : ");
+        JLabel group_name = new JLabel("그룹이름 : " + last_group_name);
         group_name.setBackground(Color.white);
         group_name.setOpaque(true);
         north.add(group_name);
 
-        JLabel leader_name = new JLabel("대표자 이름 : ");
+        JLabel leader_name = new JLabel("대표자 이름 : " + last_agent_name);
         north.add(leader_name);
 
-        JLabel starttime = new JLabel("이용 시작 시간 : ");
+        JLabel starttime = new JLabel("이용 시작 시간 : " + logic.getTimeInfo(last_group_name)[0]);
         north.add(starttime);
 
-        JLabel endtime = new JLabel("이용 마침 시간 : ");
+        JLabel endtime = new JLabel("이용 마침 시간 : " + logic.getTimeInfo(last_group_name)[1]);
         north.add(endtime);
 
         //////////////////////////////////////////////////////////////////////
@@ -983,28 +982,7 @@ public class GUI extends JFrame {
 
 
         // GUI 중앙에 대한 기능입니다. : 그룹원 정보 출력
-        ////////////////////////////////////////////////////////////////////////////
-        // test data입니다. 파일에서 불러와 주세요.
-        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-        ////////////////////////////////////////////////////////////////////////////
-
-        String[][] members = {{"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"}};
+        String[][] members = logic.getMemberInfo(last_group_name, header);
 
         DefaultTableModel model = new DefaultTableModel(members, header);
         JTable showMembers = new JTable(model);

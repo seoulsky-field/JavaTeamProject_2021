@@ -187,7 +187,7 @@ public class Logic {
             Scanner lines = new Scanner(input);
             agent_name = lines.nextLine().split(",")[0];
         } catch (FileNotFoundException e){
-              throw new FileNotFoundException();
+            throw new FileNotFoundException();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -231,9 +231,4 @@ public class Logic {
             e.printStackTrace();
         }
     }
-
-    //아니오 버튼 눌렀을 경우
-    public void btn_no(){
-    }
-
 }
