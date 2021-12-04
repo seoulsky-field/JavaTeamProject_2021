@@ -232,8 +232,121 @@ public class Logic {
         }
     }
 
-    //아니오 버튼 눌렀을 경우
-    public void btn_no(){
+    // parameter
+    // level, facility, vaccine O/X, starttime, endtime
+    // String[] : 이름, 생년월일, 연락처, 주소, 백신접종, 음성확인서
+    // String groupName,
+
+    // 한 사람씩 enter possible 여부를 확인
+    public boolean enter_judgement(String level, String facility, String[][] members, String groupName) {
+
+        String[][] member = members;
+        int covid = Integer.parseInt(level);
+
+        String place = facility;
+
+        //member[2]~[3]이 없어서 임시로 지정
+        String starttime = this.getTimeInfo(groupName)[0];
+        String endtime = this.getTimeInfo(groupName)[1];
+
+        String[] sTime = starttime.split(":");
+
+        int sHour = Integer.parseInt(sTime[0]);
+//        int sMin = Integer.parseInt(sTime[1]);
+
+        String[] eTime = endtime.split(":");
+        int eHour = Integer.parseInt(eTime[0]);
+//        int eMin = Integer.parseInt(eTime[1]);
+
+        boolean possible = true;
+
+        for (int i = 0; i < member.length; i++) {
+            if (covid == 1) {
+                if (place == "식당") { //제한없음
+                    possible = true;
+                } else if (place == "스터디 카페") { //제한없음
+                    possible = true;
+                } else { //제한없음
+                    possible = true;
+                }
+            } else if (covid == 2) {
+                if (place == "식당") { //24시 이후 입장 불가
+                    if (sHour <= 24 && eHour <= 24) {
+                        possible = true;
+                    }
+                    else {
+                        possible = false;
+                        break;
+                    }
+                } else if (place == "스터디 카페") { //제한없음
+                    possible = true;
+                } else { //제한없음
+                    possible = true;
+                }
+            } else if (covid == 3) {
+                if (place == "식당") { //22시 이후 입장불가
+                    if (sHour <= 22 && eHour <= 22) {
+                        possible = true;
+                    }
+                    else {
+                        possible = false;
+                        break;
+                    }
+                } else if (place == "스터디 카페") { // 제한없음
+                    possible = true;
+                } else { //제한없음
+                    possible = true;
+                }
+            } else {
+                if (place == "식당") { //21시 이후 입장불가, 백신패스o-> 18시 이후 4인까지
+                    if ((sHour >= 7 && sHour <= 21) && eHour <= 21) {
+                        if (sHour <= 18 && eHour <= 18) {
+                            possible = true;
+                        }else {
+                            if (member[i][4] == "O") {
+                                if (member.length <= 4) {
+                                    possible = true;
+                                } else {
+                                    possible = false;
+                                    break;
+                                }
+                            }else {
+                                 if (member.length <= 2) {
+                                    //그룹인원수 어떻게 하는지
+                                    possible = true;
+                                 }else {
+                                     possible = false;
+                                     break;
+                                 }
+                            }
+                        }
+                    } else {
+                        possible = false;
+                        break;
+                    }
+                }
+                if (place == "스터디 카페") { // 22시 이후 운영제한
+                    if (sHour <= 22 && eHour <= 22) {
+                        possible = true;
+                    }
+                    else {
+                        possible = false;
+                        break;
+                    }
+                }
+                if (place == "PC방") { // 22시 이후 운영제한
+                    if (sHour <= 22 && eHour <= 22) {
+                        possible = true;
+                    }
+                    else {
+                        possible = false;
+                        break;
+                    }
+                }
+            }
+        }
+        System.out.println(possible);
+        return possible;
     }
 
 }
