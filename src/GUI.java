@@ -19,41 +19,48 @@ public class GUI extends JFrame {
     String ruleString = "================현행규정================<br>"+ "거리두기 1단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
     String levelName = "1";
     String facilityName = "스터디 카페";
+    int judge = 1;  // 모임이 가능하다면 1, 모임이 불가능하다면 0
 
     public void main_gui() {
         setSize(300, 200);
         setTitle("초기 화면");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+
+
         Container mainContainer = getContentPane();
         mainContainer.setLayout(new BorderLayout());
-        mainContainer.setBackground(Color.lightGray);
+        mainContainer.setBackground(new Color(215, 187, 246));
+
+        Color background_color = new Color(0xD7BBE6);
+        Color point_color = new Color(0xc4bee3);
 
         JPanel north = new JPanel();
-        north.setBackground(Color.lightGray);
+        north.setBackground(background_color);
         mainContainer.add(north, BorderLayout.NORTH);
 
         JPanel center = new JPanel();
-        center.setBackground(Color.lightGray);
+        center.setBackground(background_color);
         center.setLayout(new GridLayout(5, 1));
         mainContainer.add(center, BorderLayout.CENTER);
 
         JPanel east = new JPanel();
-        east.setBackground(Color.lightGray);
+        east.setBackground(background_color);
         mainContainer.add(east, BorderLayout.EAST);
 
         JPanel west = new JPanel();
-        west.setBackground(Color.lightGray);
+        west.setBackground(background_color);
         mainContainer.add(west, BorderLayout.WEST);
 
         JPanel south = new JPanel();
-        south.setBackground(Color.lightGray);
+        south.setBackground(background_color);
         mainContainer.add(south, BorderLayout.SOUTH);
 
         // 새 그룹 추가 버튼 - 클릭시 기존의 그릅 추가 버튼으로 이동
         JButton BTN_addGroup = new JButton();
         BTN_addGroup.setText("새 그룹 추가");
         BTN_addGroup.setSize(30, 30);
+        BTN_addGroup.setBackground(point_color);
         center.add(BTN_addGroup);
 
         BTN_addGroup.addActionListener(new ActionListener() {
@@ -86,6 +93,7 @@ public class GUI extends JFrame {
         JButton BTN_accept = new JButton();
         BTN_accept.setText("입력 확인");
         BTN_accept.setSize(30, 30);
+        BTN_accept.setBackground(point_color);
         center.add(BTN_accept);
 
         BTN_accept.addActionListener(new ActionListener() {
@@ -976,11 +984,6 @@ public class GUI extends JFrame {
         JLabel endtime = new JLabel("이용 마침 시간 : ");
         north.add(endtime);
 
-        //////////////////////////////////////////////////////////////////////
-        // 현행 규정과 통계 관련해서 코드를 모두 작성하고 변수에 알맞게 대입해주세요.
-        // 모임이 가능한지와 불가능한지 또한 판정하는 코드를 작성 후 변수에 대입해주세요.
-        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-        ///////////////////////////////////////////////////////////////////////
 
         JLabel level = new JLabel("현재 거리두기 단계 : ");
         center_north.add(level);
@@ -1007,6 +1010,7 @@ public class GUI extends JFrame {
                 if(levelName == "1" && facilityName == "스터디 카페") {
                     ruleString ="================현행규정================<br>"+ "거리두기 1단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
                     rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = enter_judgement();
                 }else if(levelName == "1" && facilityName == "식당") {
                     ruleString ="================현행규정================<br>"+ "거리두기 1단계<br>"+"운영시간 - 제한 없음<br>"+ "테이블간 1m 거리두기 또는 좌석/테이블 간 한 칸 띄우기 또는 테이블 간 칸막이 설치<br>"+ "인원 제한 없음<br>";
                     rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
@@ -1112,27 +1116,7 @@ public class GUI extends JFrame {
         JLabel judgement = new JLabel(finalJudgement, JLabel.CENTER);
         center_center.add(judgement,BorderLayout.SOUTH);
 
-
-        // GUI 중앙에 대한 기능입니다. : 그룹원 정보 출력
-        ////////////////////////////////////////////////////////////////////////////
-        // test data입니다. 파일에서 불러와 주세요.
-        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-        ////////////////////////////////////////////////////////////////////////////
-
-        String[][] members = {{"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"}};
+        String[][] members = logic.getMemberInfo(last_group_name, header);
 
         DefaultTableModel model = new DefaultTableModel(members, header);
         JTable showMembers = new JTable(model);
@@ -1169,25 +1153,25 @@ public class GUI extends JFrame {
         center_south.add(print);
 
 
-        // GUI 하단 : 인쇄하기 버튼과 창 닫기 버튼
-        JButton BTN_print = new JButton("인쇄하기");
-        BTN_print.setSize(30,30);
-        south.add(BTN_print);
-
-        BTN_print.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ////////////////////////////////////////////////////////////////////////////
-                // 실제 인쇄 관련한 코드를 작성해주시면 됩니다.
-                // 구글에 Java 인쇄 기능 등의 키워드를 입력 후 검색하시면 관련 코드들 나옵니다.
-                // 해당 코드들 복사한 후 적절하게 수정하여 실행이 되도록 해주시면 됩니다.
-                // 예시 사이트 : https://dinae.tistory.com/24
-                ////////////////////////////////////////////////////////////////////////////
-            }
-        });
+//        // GUI 하단 : 인쇄하기 버튼과 창 닫기 버튼
+//        JButton BTN_print = new JButton("인쇄하기");
+//        BTN_print.setSize(30,30);
+//        south.add(BTN_print);
+//
+//        BTN_print.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                ////////////////////////////////////////////////////////////////////////////
+//                // 실제 인쇄 관련한 코드를 작성해주시면 됩니다.
+//                // 구글에 Java 인쇄 기능 등의 키워드를 입력 후 검색하시면 관련 코드들 나옵니다.
+//                // 해당 코드들 복사한 후 적절하게 수정하여 실행이 되도록 해주시면 됩니다.
+//                // 예시 사이트 : https://dinae.tistory.com/24
+//                ////////////////////////////////////////////////////////////////////////////
+//            }
+//        });
 
         JButton BTN_close_print = new JButton("창 닫기");
-        BTN_print.setSize(30,30);
+        BTN_close_print.setSize(30,30);
         south.add(BTN_close_print);
 
         BTN_close_print.addActionListener(new ActionListener() {
@@ -1200,5 +1184,97 @@ public class GUI extends JFrame {
 
         printFrame.setVisible(true);
         printFrame.requestFocusInWindow();
+    }
+
+
+    // parameter
+    // level, facility, vaccine O/X, starttime, endtime
+
+    public static int enter_judgement(String level, String facility, String vaccine, String start, String end) {
+        int covid = Integer.parseInt(level);
+        String place = facility;
+
+        String Vaccine = "o";
+
+        //member[2]~[3]이 없어서 임시로 지정
+        String starttime = start;
+        String endtime = end;
+
+        String[] sTime = starttime.split(":");
+
+        int sHour = Integer.parseInt(sTime[0]);
+        int sMin = Integer.parseInt(sTime[1]);
+
+        String[] eTime = endtime.split(":");
+        int eHour = Integer.parseInt(eTime[0]);
+        int eMin = Integer.parseInt(eTime[1]);
+
+        if (covid == 1) {
+            if (place == "식당") { //제한없음
+                return 1;
+            } else if (place == "스터디 카페") { //제한없음
+                return 1;
+            } else { //제한없음
+                return 1;
+            }
+        } else if (covid == 2) {
+            if (place == "식당") { //24시 이후 입장 불가
+                if (sHour <= 24 || eHour <= 24) //이렇게 하는게 맞나?
+                    return 0;
+                else
+                    return 1;
+            } else if (place == "스터디 카페") { //제한없음
+                return 1;
+            } else { //제한없음
+                return 1;
+            }
+        } else if (covid == 3) {
+            if (place == "식당") { //22시 이후 입장불가
+                if (sHour <= 22 || eHour <= 22) //이렇게 하는게 맞나?
+                    return 0;
+                else
+                    return 1;
+            } else if (place == "스터디 카페") { // 제한없음
+                return 1;
+            } else { //제한없음
+                return 1;
+            }
+        } else {
+            if (place == "식당") { //21시 이후 입장불가, 백신패스o-> 18시 이후 4인까지
+                if (sHour <= 21 || eHour <= 21) {
+                    return 0;
+                } else if (sHour <= 18 || eHour <= 18) {
+                    if (Vaccine == "o") {
+                        if (GroupMember.length() <= 4) {
+                            return 1;
+                        }
+                        else {
+                            return 0;
+                        }
+                    } else if (GroupMember.length <= 2) {
+                        //그룹인원수 어떻게 하는지
+                        return 1;
+                    } else{
+                        return 0;
+                    }
+                } else
+                    return 1;
+            }
+            if (place == "스터디 카페") { // 22시 이후 운영제한
+                if (sHour <= 22 || eHour <= 22)
+                    return 0;
+                else
+                    return 1;
+            }
+            if (place == "PC방") { // 22시 이후 운영제한
+                return 1;
+            }
+            if (place == "스터디 카페") { // 22시 이후 운영제한
+                if (sHour <= 22 || eHour <= 22)
+                    return 0;
+                else
+                    return 1;
+            }
+        }
     }
 }
