@@ -6,8 +6,6 @@ import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -103,9 +101,13 @@ public class GUI extends JFrame {
                     String[] line = logic.getGroupInfo(group_name.getText(), password.getText());
                     last_group_name = line[0];
                     last_agent_name = logic.getAgent_name(group_name.getText());
-
-                    func_gui();
-                    dispose();
+                    if (!Objects.equals(last_agent_name, leader_name.getText())) {
+                        setTitle("대표자 이름이 잘못 입력되었습니다.");
+                    }
+                    else {
+                        func_gui();
+                        dispose();
+                    }
                 } catch (FileNotFoundException err) {
                     setTitle("지정된 파일을 찾을 수 없습니다.");
                 } catch (NullPointerException err) {
@@ -448,7 +450,7 @@ public class GUI extends JFrame {
         negative_no.setVisible(false);
 
         // arraylist 변수 그룹 생성
-        ArrayList<GroupMember> group = new ArrayList<>();
+        ArrayList<String[]> group = new ArrayList<>();
 
         // check_list = {백신 접종 여부, 음성 확인서 여부}
         String[] check_list = {"null", "null"};
@@ -539,13 +541,17 @@ public class GUI extends JFrame {
                     member[3] = address.getText();
                     member[4] = check_list[0];
                     member[5] = check_list[1];
-                    group.add(new GroupMember(member));
+                    group.add(member);
 
                     // 텍스트 초기화
-                    person_name.setText("그룹원 이름");
-                    birthday.setText("생년 월일 6자리를 입력하세요.");
-                    address.setText("거주중인 주소를 입력하세요.");
-                    phoneNumber.setText("핸드폰 번호를 입력하세요.");
+                    person_name.setText("회원 이름");
+                    clear_txt(person_name);
+                    birthday.setText("생년 월일 6자리");
+                    clear_txt(birthday);
+                    address.setText("거주중인 주소");
+                    clear_txt(address);
+                    phoneNumber.setText("전화번호(-제외)");
+                    clear_txt(phoneNumber);
 
                     // 음성 확인서 숨기기
                     negative.setVisible(false);
@@ -568,7 +574,7 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 // 회원 정보 파일 만들기
                 // 양식 : 이름,생년월일,연락처,주소,백신접종,음성확인서
-                logic.createMemberInfo(group_name, group);
+                logic.createMemberInfobyArray(group_name, group);
 
                 // 창 닫기
                 addFrame.dispose();
@@ -598,6 +604,7 @@ public class GUI extends JFrame {
         });
     }
 
+    // 그룹 정보 출력을 담당하는 함수
     public void group_information() {
         JFrame infoFrame = new JFrame();
         infoFrame.setSize(800, 400);
@@ -609,6 +616,7 @@ public class GUI extends JFrame {
 
         JPanel north = new JPanel();
         north.setBackground(color_lavender);
+        north.setLayout(new GridLayout(1,4));
         infoContainer.add(north, BorderLayout.NORTH);
 
         JPanel center = new JPanel();
@@ -779,7 +787,7 @@ public class GUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 modiFrame.dispose();
-                people_add(last_group_name);
+                update_person_add(last_group_name);
             }
         });
 
@@ -821,7 +829,7 @@ public class GUI extends JFrame {
                     }
                     updatedMembers.add(rows);
                 }
-                logic.createMemberInfo2(last_group_name, updatedMembers);
+                logic.createMemberInfobyString(last_group_name, updatedMembers);
                 modiFrame.dispose();
                 func_gui();
             }
@@ -831,7 +839,7 @@ public class GUI extends JFrame {
         modiFrame.requestFocusInWindow();
     }
 
-    public void person_add(String group_name) {
+    public void update_person_add(String group_name) {
         JFrame addFrame = new JFrame();
         addFrame.setSize(400, 200);
         addFrame.setTitle("그룹 추가 진행 중");
@@ -897,7 +905,7 @@ public class GUI extends JFrame {
         negative_no.setVisible(false);
 
         // arraylist 변수 그룹 생성
-        ArrayList<GroupMember> group = new ArrayList<>();
+        ArrayList<String[]> group = new ArrayList<>();
 
         // check_list = {백신 접종 여부, 음성 확인서 여부}
         String[] check_list = {"null", "null"};
@@ -988,13 +996,17 @@ public class GUI extends JFrame {
                     member[3] = address.getText();
                     member[4] = check_list[0];
                     member[5] = check_list[1];
-                    group.add(new GroupMember(member));
+                    group.add(member);
 
                     // 텍스트 초기화
-                    person_name.setText("그룹원 이름");
-                    birthday.setText("생년 월일 6자리를 입력하세요.");
-                    address.setText("거주중인 주소를 입력하세요.");
-                    phoneNumber.setText("핸드폰 번호를 입력하세요.");
+                    person_name.setText("회원 이름");
+                    clear_txt(person_name);
+                    birthday.setText("생년 월일 6자리");
+                    clear_txt(birthday);
+                    address.setText("거주중인 주소");
+                    clear_txt(address);
+                    phoneNumber.setText("전화번호(-제외)");
+                    clear_txt(phoneNumber);
 
                     // 음성 확인서 숨기기
                     negative.setVisible(false);
@@ -1017,11 +1029,11 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 // 회원 정보 파일 만들기
                 // 양식 : 이름,생년월일,연락처,주소,백신접종,음성확인서
-                logic.createMemberInfo(group_name, group);
+                logic.updateMemberInfo(group_name, group);
 
                 // 창 닫기
                 addFrame.dispose();
-                func_gui();
+                group_modify();
             }
         });
 
@@ -1079,7 +1091,7 @@ public class GUI extends JFrame {
                     if (!Objects.equals(personName.getText(), s[0]) && !Objects.equals(personPhone.getText(), s[2]))
                         dummy.add(s);
                 }
-                logic.createMemberInfo3(last_group_name, dummy);
+                logic.createMemberInfobyArray(last_group_name, dummy);
                 deletePeople.dispose();
                 group_modify();
             }
@@ -1491,11 +1503,6 @@ public class GUI extends JFrame {
             }
         });
 
-        ////////////////////////////////////////////////////////////////////////////
-        // 백신 접종 관련한 조건문 통해서 변수에 값을 집어넣어 주세요.
-        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-        ////////////////////////////////////////////////////////////////////////////
-
         String[] check_list = {"X","O"};
         int vaccine_O = 0;
         int negative = 0;
@@ -1565,7 +1572,4 @@ public class GUI extends JFrame {
         printFrame.setVisible(true);
         printFrame.requestFocusInWindow();
     }
-
-
-
 }
