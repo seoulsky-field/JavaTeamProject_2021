@@ -6,8 +6,6 @@ import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -16,41 +14,50 @@ public class GUI extends JFrame {
     String last_group_name;
     String last_agent_name;
     String[] header = {"이름", "생년월일", "연락처", "주소", "백신 접종", "음성 확인서"};
+    String ruleString = "================현행규정================<br>"+ "거리두기 1단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+    String levelName = "-";
+    String facilityName = "-";
+    boolean judge;  // 모임이 가능하다면 true, 모임이 불가능하다면 false
+    String finalJudgement = "※최종 판정 :";
+
+    Color color_lavender = new Color(0xD7BBE6);
+    Color color_4 = new Color(0xc4bee3);
 
     public void main_gui() {
         setSize(300, 200);
-        setTitle("초기 화면 수정");
+        setTitle("초기 화면");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Container mainContainer = getContentPane();
         mainContainer.setLayout(new BorderLayout());
-        mainContainer.setBackground(Color.lightGray);
+        mainContainer.setBackground(new Color(215, 187, 246));
 
         JPanel north = new JPanel();
-        north.setBackground(Color.lightGray);
+        north.setBackground(color_lavender);
         mainContainer.add(north, BorderLayout.NORTH);
 
         JPanel center = new JPanel();
-        center.setBackground(Color.lightGray);
+        center.setBackground(color_lavender);
         center.setLayout(new GridLayout(5, 1));
         mainContainer.add(center, BorderLayout.CENTER);
 
         JPanel east = new JPanel();
-        east.setBackground(Color.lightGray);
+        east.setBackground(color_lavender);
         mainContainer.add(east, BorderLayout.EAST);
 
         JPanel west = new JPanel();
-        west.setBackground(Color.lightGray);
+        west.setBackground(color_lavender);
         mainContainer.add(west, BorderLayout.WEST);
 
         JPanel south = new JPanel();
-        south.setBackground(Color.lightGray);
+        south.setBackground(color_lavender);
         mainContainer.add(south, BorderLayout.SOUTH);
 
         // 새 그룹 추가 버튼 - 클릭시 기존의 그릅 추가 버튼으로 이동
         JButton BTN_addGroup = new JButton();
         BTN_addGroup.setText("새 그룹 추가");
         BTN_addGroup.setSize(30, 30);
+        BTN_addGroup.setBackground(color_4);
         center.add(BTN_addGroup);
 
         BTN_addGroup.addActionListener(new ActionListener() {
@@ -83,6 +90,7 @@ public class GUI extends JFrame {
         JButton BTN_accept = new JButton();
         BTN_accept.setText("입력 확인");
         BTN_accept.setSize(30, 30);
+        BTN_accept.setBackground(color_4);
         center.add(BTN_accept);
 
         BTN_accept.addActionListener(new ActionListener() {
@@ -93,9 +101,13 @@ public class GUI extends JFrame {
                     String[] line = logic.getGroupInfo(group_name.getText(), password.getText());
                     last_group_name = line[0];
                     last_agent_name = logic.getAgent_name(group_name.getText());
-
-                    func_gui();
-                    dispose();
+                    if (!Objects.equals(last_agent_name, leader_name.getText())) {
+                        setTitle("대표자 이름이 잘못 입력되었습니다.");
+                    }
+                    else {
+                        func_gui();
+                        dispose();
+                    }
                 } catch (FileNotFoundException err) {
                     setTitle("지정된 파일을 찾을 수 없습니다.");
                 } catch (NullPointerException err) {
@@ -116,7 +128,7 @@ public class GUI extends JFrame {
         // GUI 크기 및 타이틀 설정
         JFrame funcFrame = new JFrame();
         funcFrame.setSize(400, 200);
-        funcFrame.setTitle("백신");
+        funcFrame.setTitle("메인 화면");
         funcFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // container 설정
@@ -125,17 +137,25 @@ public class GUI extends JFrame {
 
         JPanel north = new JPanel();
         north.setLayout(new GridLayout(1,2));
-        north.setBackground(Color.lightGray);
+        north.setBackground(color_lavender);
         funcContainer.add(north, BorderLayout.NORTH);
 
         JPanel center = new JPanel();
         center.setLayout(new GridLayout(2,2,10,10));
-        center.setBackground(Color.lightGray);
+        center.setBackground(color_lavender);
         funcContainer.add(center, BorderLayout.CENTER);
+
+        JPanel east = new JPanel();
+        east.setBackground(color_lavender);
+        funcContainer.add(east, BorderLayout.EAST);
+
+        JPanel west = new JPanel();
+        west.setBackground(color_lavender);
+        funcContainer.add(west, BorderLayout.WEST);
 
         JPanel south = new JPanel();
         south.setLayout(new GridLayout(1,2));
-        south.setBackground(Color.lightGray);
+        south.setBackground(color_lavender);
         funcContainer.add(south, BorderLayout.SOUTH);
 
         // 그룹 이름을 받아와서 출력
@@ -152,7 +172,7 @@ public class GUI extends JFrame {
         BTN_group_show.setSize(150, 120);
         BTN_group_show.setText("그룹 정보 조회");
         BTN_group_show.setFont(new Font("gothic", Font.BOLD, 15));
-        BTN_group_show.setBackground(Color.gray);
+        BTN_group_show.setBackground(color_4);
         BTN_group_show.setOpaque(true);
 
         center.add(BTN_group_show);
@@ -172,7 +192,7 @@ public class GUI extends JFrame {
         BTN_group_modify.setSize(150, 120);
         BTN_group_modify.setText("그룹 정보 수정");
         BTN_group_modify.setFont(new Font("gothic", Font.BOLD, 15));
-        BTN_group_modify.setBackground(Color.gray);
+        BTN_group_modify.setBackground(color_4);
         BTN_group_modify.setOpaque(true);
 
         center.add(BTN_group_modify);
@@ -193,7 +213,7 @@ public class GUI extends JFrame {
         BTN_group_delete.setSize(150, 120);
         BTN_group_delete.setText("그룹 삭제");
         BTN_group_delete.setFont(new Font("gothic", Font.BOLD, 15));
-        BTN_group_delete.setBackground(Color.lightGray);
+        BTN_group_delete.setBackground(color_4);
         BTN_group_delete.setOpaque(true);
 
         center.add(BTN_group_delete);
@@ -213,7 +233,7 @@ public class GUI extends JFrame {
         BTN_report_print.setSize(150, 120);
         BTN_report_print.setText("최종 보고서 출력");
         BTN_report_print.setFont(new Font("gothic", Font.BOLD, 15));
-        BTN_report_print.setBackground(Color.lightGray);
+        BTN_report_print.setBackground(color_4);
         BTN_report_print.setOpaque(true);
 
         center.add(BTN_report_print);
@@ -230,7 +250,7 @@ public class GUI extends JFrame {
         JButton BTN_endprogram = new JButton();
         BTN_endprogram.setText("프로그램 종료하기");
         BTN_endprogram.setFont(new Font("gothic", Font.BOLD, 15));
-        BTN_endprogram.setBackground(Color.lightGray);
+        BTN_endprogram.setBackground(color_4);
         BTN_endprogram.setOpaque(true);
         south.add(BTN_endprogram);
 
@@ -244,7 +264,7 @@ public class GUI extends JFrame {
         JButton BTN_goto_maingui = new JButton();
         BTN_goto_maingui.setText("이전 화면으로 돌아가기");
         BTN_goto_maingui.setFont(new Font("gothic", Font.BOLD, 15));
-        BTN_goto_maingui.setBackground(Color.lightGray);
+        BTN_goto_maingui.setBackground(color_4);
         BTN_goto_maingui.setOpaque(true);
         south.add(BTN_goto_maingui);
 
@@ -265,34 +285,35 @@ public class GUI extends JFrame {
         JFrame groupAddFrame = new JFrame();
         groupAddFrame.setSize(400, 200);
         groupAddFrame.setTitle("그룹 정보 추가");
+        groupAddFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // container 처리
         Container groupAddContainer = groupAddFrame.getContentPane();
         groupAddContainer.setLayout(new BorderLayout());
 
         JPanel north = new JPanel();
-        north.setBackground(Color.lightGray);
+        north.setBackground(color_lavender);
         groupAddContainer.add(north, BorderLayout.NORTH);
 
         JPanel south = new JPanel();
-        south.setBackground(Color.lightGray);
+        south.setBackground(color_lavender);
         groupAddContainer.add(south, BorderLayout.SOUTH);
 
         JPanel east = new JPanel();
-        east.setBackground(Color.lightGray);
+        east.setBackground(color_lavender);
         groupAddContainer.add(east, BorderLayout.EAST);
 
         JPanel west = new JPanel();
-        west.setBackground(Color.lightGray);
+        west.setBackground(color_lavender);
         groupAddContainer.add(west, BorderLayout.WEST);
 
         JPanel center = new JPanel();
-        center.setBackground(Color.lightGray);
+        center.setBackground(color_lavender);
         center.setLayout(new GridLayout(5,1,5,5));
         groupAddContainer.add(center, BorderLayout.CENTER);
 
         JPanel center_south = new JPanel();
-        center_south.setBackground(Color.lightGray);
+        center_south.setBackground(color_lavender);
         center_south.setLayout(new GridLayout(1,2));
 
         // 그룹명 입력받기
@@ -322,6 +343,7 @@ public class GUI extends JFrame {
 
         // 그룹원 추가하기 버튼 눌렀을 때 리스너 처리
         JButton BTN_addgrouppeople = new JButton("그룹원 추가");
+        BTN_addgrouppeople.setBackground(color_4);
         center_south.add(BTN_addgrouppeople);
 
         BTN_addgrouppeople.addActionListener(new ActionListener() {
@@ -347,6 +369,7 @@ public class GUI extends JFrame {
 
         // 취소하기 버튼 눌렀을 때 리스너 처리
         JButton BTN_canclegroupadd = new JButton("취소");
+        BTN_canclegroupadd.setBackground(color_4);
         center_south.add(BTN_canclegroupadd);
 
         BTN_canclegroupadd.addActionListener(new ActionListener() {
@@ -365,20 +388,21 @@ public class GUI extends JFrame {
         JFrame addFrame = new JFrame();
         addFrame.setSize(400, 200);
         addFrame.setTitle("그룹 추가 진행 중");
+        addFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Container addContainer = addFrame.getContentPane();
         addContainer.setLayout(new BorderLayout());
 
         JPanel north = new JPanel();
-        north.setBackground(Color.lightGray);
+        north.setBackground(color_lavender);
         addContainer.add(north, BorderLayout.NORTH);
 
         JPanel center = new JPanel();
-        center.setBackground(Color.lightGray);
+        center.setBackground(color_lavender);
         addContainer.add(center, BorderLayout.CENTER);
 
         JPanel south = new JPanel();
-        south.setBackground(Color.lightGray);
+        south.setBackground(color_lavender);
         addContainer.add(south, BorderLayout.SOUTH);
 
         // 그룹원 이름을 입력받습니다.
@@ -426,7 +450,7 @@ public class GUI extends JFrame {
         negative_no.setVisible(false);
 
         // arraylist 변수 그룹 생성
-        ArrayList<GroupMember> group = new ArrayList<>();
+        ArrayList<String[]> group = new ArrayList<>();
 
         // check_list = {백신 접종 여부, 음성 확인서 여부}
         String[] check_list = {"null", "null"};
@@ -475,18 +499,11 @@ public class GUI extends JFrame {
             }
         });
 
-        ////////////////////////////////////////////////////////////////////////////
-        // 비밀번호 4자리 생성 관련 TextField를 추가하였습니다.
-        // 해당 기능과 관련하여 아래 구현하셨던 기능에 비밀번호 관련 기능을 추가해주세요.
-        // 또한 그룹 추가 창을 요청하신대로 분리하였습니다. 아래 group_name 과 time 관련해서 수정해주세요.
-        // 이 코드는 에러 방지를 위해 작성된 "임의의" 코드입니다.
-        //
-        ////////////////////////////////////////////////////////////////////////////
-
         // 그룹원 저장하기
         JButton BTN_addperson = new JButton();
         BTN_addperson.setText("그룹원 추가하기");
         BTN_addperson.setSize(30,30);
+        BTN_addperson.setBackground(color_4);
         south.add(BTN_addperson, BorderLayout.WEST);
 
         // 입력이 완료되면 저장하고 문자열을 초기화해야 합니다.
@@ -524,7 +541,7 @@ public class GUI extends JFrame {
                     member[3] = address.getText();
                     member[4] = check_list[0];
                     member[5] = check_list[1];
-                    group.add(new GroupMember(member));
+                    group.add(member);
 
                     // 텍스트 초기화
                     person_name.setText("그룹원 이름");
@@ -544,6 +561,7 @@ public class GUI extends JFrame {
         JButton BTN_endAddgroup = new JButton();
         BTN_endAddgroup.setText("입력 완료");
         BTN_endAddgroup.setSize(30,30);
+        BTN_endAddgroup.setBackground(color_4);
         south.add(BTN_endAddgroup, BorderLayout.EAST);
 
         // 입력 완료 버튼이 클릭된 경우
@@ -586,21 +604,22 @@ public class GUI extends JFrame {
         JFrame infoFrame = new JFrame();
         infoFrame.setSize(800, 400);
         infoFrame.setTitle("그룹 정보를 입력하세요!");
+        infoFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Container infoContainer = infoFrame.getContentPane();
         infoContainer.setLayout(new BorderLayout());
 
         JPanel north = new JPanel();
-        north.setBackground(Color.lightGray);
+        north.setBackground(color_lavender);
         infoContainer.add(north, BorderLayout.NORTH);
 
         JPanel center = new JPanel();
-        center.setBackground(Color.lightGray);
+        center.setBackground(color_lavender);
         infoContainer.add(center, BorderLayout.CENTER);
 
         JPanel south = new JPanel();
         south.setLayout(new BorderLayout());
-        south.setBackground(Color.lightGray);
+        south.setBackground(color_lavender);
         infoContainer.add(south, BorderLayout.SOUTH);
 
         // GUI 상단에 대한 기능입니다.
@@ -655,6 +674,7 @@ public class GUI extends JFrame {
         JButton BTN_end_information = new JButton();
         BTN_end_information.setText("조회 완료");
         BTN_end_information.setSize(30,30);
+        BTN_end_information.setBackground(color_4);
         south.add(BTN_end_information, BorderLayout.EAST);
 
         BTN_end_information.addActionListener(new ActionListener() {
@@ -675,21 +695,22 @@ public class GUI extends JFrame {
         JFrame modiFrame = new JFrame();
         modiFrame.setSize(800, 400);
         modiFrame.setTitle("그룹 정보 수정");
+        modiFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Container modiContainer = modiFrame.getContentPane();
         modiContainer.setLayout(new BorderLayout());
 
         JPanel north = new JPanel();
-        north.setBackground(Color.lightGray);
+        north.setBackground(color_lavender);
         modiContainer.add(north, BorderLayout.NORTH);
 
         JPanel center = new JPanel();
-        center.setBackground(Color.lightGray);
+        center.setBackground(color_lavender);
         modiContainer.add(center, BorderLayout.CENTER);
 
         JPanel south = new JPanel();
         south.setLayout(new BorderLayout());
-        south.setBackground(Color.lightGray);
+        south.setBackground(color_lavender);
         modiContainer.add(south, BorderLayout.SOUTH);
 
         // GUI 상단에 대한 기능입니다. : 그룹 이름, 이용 시작 시간, 이용 종료 시간
@@ -750,10 +771,26 @@ public class GUI extends JFrame {
         center.add(print);
 
         // GUI 하단에 대한 기능입니다.
+
+        JButton BTN_add_person = new JButton();
+        BTN_add_person.setText("그룹원 추가");
+        BTN_add_person.setSize(30,30);
+        BTN_add_person.setBackground(color_4);
+        south.add(BTN_add_person, BorderLayout.WEST);
+        BTN_add_person.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                modiFrame.dispose();
+                update_person_add(last_group_name);
+            }
+        });
+
+
         JButton BTN_deletePerson = new JButton();
         BTN_deletePerson.setText("회원 삭제");
         BTN_deletePerson.setSize(200,30);
-        south.add(BTN_deletePerson, BorderLayout.EAST);
+        BTN_deletePerson.setBackground(color_4);
+        south.add(BTN_deletePerson, BorderLayout.CENTER);
         BTN_deletePerson.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -762,10 +799,10 @@ public class GUI extends JFrame {
             }
         });
 
-
         JButton BTN_end_modify = new JButton();
         BTN_end_modify.setText("수정 완료");
         BTN_end_modify.setSize(30,30);
+        BTN_end_modify.setBackground(color_4);
         south.add(BTN_end_modify, BorderLayout.EAST);
 
         BTN_end_modify.addActionListener(new ActionListener() {
@@ -786,7 +823,7 @@ public class GUI extends JFrame {
                     }
                     updatedMembers.add(rows);
                 }
-                logic.createMemberInfo2(last_group_name, updatedMembers);
+                logic.createMemberInfo1(last_group_name, updatedMembers);
                 modiFrame.dispose();
                 func_gui();
             }
@@ -796,25 +833,225 @@ public class GUI extends JFrame {
         modiFrame.requestFocusInWindow();
     }
 
+    public void update_person_add(String group_name) {
+        JFrame addFrame = new JFrame();
+        addFrame.setSize(400, 200);
+        addFrame.setTitle("그룹 추가 진행 중");
+        addFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        Container addContainer = addFrame.getContentPane();
+        addContainer.setLayout(new BorderLayout());
+
+        JPanel north = new JPanel();
+        north.setBackground(color_lavender);
+        addContainer.add(north, BorderLayout.NORTH);
+
+        JPanel center = new JPanel();
+        center.setBackground(color_lavender);
+        addContainer.add(center, BorderLayout.CENTER);
+
+        JPanel south = new JPanel();
+        south.setBackground(color_lavender);
+        addContainer.add(south, BorderLayout.SOUTH);
+
+        // 그룹원 이름을 입력받습니다.
+        JTextField person_name = new JTextField("회원 이름", 7);
+        center.add(person_name);
+        clear_txt(person_name);
+
+        // 생년월일을 입력받습니다.
+        JTextField birthday = new JTextField("생년 월일 6자리", 8);
+        center.add(birthday);
+        clear_txt(birthday);
+
+        // 연락처를 입력받습니다.
+        JTextField phoneNumber = new JTextField("전화번호(-제외)", 15);
+        center.add(phoneNumber);
+        clear_txt(phoneNumber);
+
+        // 주소를 입력받습니다.
+        JTextField address = new JTextField("거주중인 주소", 30);
+        center.add(address);
+        clear_txt(address);
+
+        // 백신 접종 여부를 확인합니다.
+        JLabel vaccine = new JLabel("백신 접종 여부");
+        vaccine.setSize(20, 10);
+        JButton vaccine_yes = new JButton("O");
+        vaccine_yes.setSize(10, 10);
+        JButton vaccine_no = new JButton("X");
+        vaccine_no.setSize(10, 10);
+
+        center.add(vaccine);
+        center.add(vaccine_yes);
+        center.add(vaccine_no);
+
+        // 음성 확인서 여부를 확인합니다.
+        JLabel negative = new JLabel("음성 확인서 여부");
+        negative.setSize(20, 10);
+        JButton negative_yes = new JButton("O");
+        negative_yes.setSize(10, 10);
+        JButton negative_no = new JButton("X");
+        negative_no.setSize(10, 10);
+
+        negative.setVisible(false);
+        negative_yes.setVisible(false);
+        negative_no.setVisible(false);
+
+        // arraylist 변수 그룹 생성
+        ArrayList<String[]> group = new ArrayList<>();
+
+        // check_list = {백신 접종 여부, 음성 확인서 여부}
+        String[] check_list = {"null", "null"};
+
+        // 백신 O 버튼을 눌렀을 시 리스너
+        vaccine_yes.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                check_list[0] = "O";
+                check_list[1] = "해당X";
+            }
+        });
+        // 백신 X 버튼을 눌렀을 시 리스너
+        vaccine_no.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                check_list[0] = "X";
+            }
+        });
+        // 음성 확인서 O 버튼을 눌렀을 시 리스너
+        negative_yes.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                check_list[1] = "O";
+            }
+        });
+        // 음성 확인서 X 버튼을 눌렀을 시 리스너
+        negative_no.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                check_list[1] = "X";
+            }
+        });
+
+        center.add(negative);
+        center.add(negative_yes);
+        center.add(negative_no);
+
+        // 백신 미접종인 경우 음성 확인서 여부 패널을 나타나게 합니다.
+        vaccine_no.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e){
+                negative.setVisible(true);
+                negative_yes.setVisible(true);
+                negative_no.setVisible(true);
+            }
+        });
+
+        // 그룹원 저장하기
+        JButton BTN_addperson = new JButton();
+        BTN_addperson.setText("그룹원 추가하기");
+        BTN_addperson.setSize(30,30);
+        BTN_addperson.setBackground(color_4);
+        south.add(BTN_addperson, BorderLayout.WEST);
+
+        // 입력이 완료되면 저장하고 문자열을 초기화해야 합니다.
+        BTN_addperson.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e){
+                // 빈칸이 있을 경우 경고창 띄우기
+                JFrame warning = new JFrame("정보를 입력하지 않았습니다.");
+                JLabel showMessage = new JLabel();
+                showMessage.setSize(new Dimension(50, 50));
+                showMessage.setFont(new Font("gothic", Font.BOLD, 15));
+                showMessage.setHorizontalAlignment(SwingConstants.CENTER);
+                warning.add(showMessage);
+
+                warning.setSize(400, 100);
+                // TODO setText() 가 맞는지 확인 필요
+                if (Objects.equals(person_name.getText(), "회원 이름")) {
+                    showMessage.setText("그룹원 이름 정보를 입력하세요.");
+                    warning.setVisible(true);
+                } else if (Objects.equals(birthday.getText(), "생년 월일 6자리")) {
+                    showMessage.setText("생년월일 정보를 입력하세요.");
+                    warning.setVisible(true);
+                } else if (Objects.equals(phoneNumber.getText(), "전화번호(-제외)")){
+                    showMessage.setText("핸드폰 번호를 입력하세요.");
+                    warning.setVisible(true);
+                } else if (Objects.equals(address.getText(), "거주중인 주소")) {
+                    showMessage.setText("주소 정보를 입력하세요.");
+                    warning.setVisible(true);
+                } else {
+                    String[] member = new String[6];
+                    // 회원이름,생년월일,연락처,주소,백신접종,음성확인서
+                    member[0] = person_name.getText();
+                    member[1] = birthday.getText();
+                    member[2] = phoneNumber.getText();
+                    member[3] = address.getText();
+                    member[4] = check_list[0];
+                    member[5] = check_list[1];
+                    group.add(member);
+
+                    // 텍스트 초기화
+                    person_name.setText("그룹원 이름");
+                    birthday.setText("생년 월일 6자리를 입력하세요.");
+                    address.setText("거주중인 주소를 입력하세요.");
+                    phoneNumber.setText("핸드폰 번호를 입력하세요.");
+
+                    // 음성 확인서 숨기기
+                    negative.setVisible(false);
+                    negative_yes.setVisible(false);
+                    negative_no.setVisible(false);
+                }
+            }
+        });
+
+        // 총 입력 완료하였을 경우
+        JButton BTN_endAddgroup = new JButton();
+        BTN_endAddgroup.setText("입력 완료");
+        BTN_endAddgroup.setSize(30,30);
+        BTN_endAddgroup.setBackground(color_4);
+        south.add(BTN_endAddgroup, BorderLayout.EAST);
+
+        // 입력 완료 버튼이 클릭된 경우
+        BTN_endAddgroup.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // 회원 정보 파일 만들기
+                // 양식 : 이름,생년월일,연락처,주소,백신접종,음성확인서
+                logic.updateMemberInfo(group_name, group);
+
+                // 창 닫기
+                addFrame.dispose();
+                group_modify();
+            }
+        });
+
+        addContainer.setVisible(true);
+        addFrame.setVisible(true);
+        addContainer.requestFocusInWindow();
+    }
+
     // 그룹원 한 명의 탈퇴를 담당하는 함수
     public void person_delete() {
         JFrame deletePeople = new JFrame();
         deletePeople.setSize(400,100);
+        deletePeople.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Container delPeoContainer = deletePeople.getContentPane();
         delPeoContainer.setLayout(new BorderLayout());
-        delPeoContainer.setBackground(Color.lightGray);
+        delPeoContainer.setBackground(color_lavender);
 
         JPanel north = new JPanel();
-        north.setBackground(Color.lightGray);
+        north.setBackground(color_lavender);
         delPeoContainer.add(north, BorderLayout.NORTH);
 
         JPanel center = new JPanel();
-        center.setBackground(Color.lightGray);
+        center.setBackground(color_lavender);
         delPeoContainer.add(center, BorderLayout.CENTER);
 
         JPanel south = new JPanel();
-        south.setBackground(Color.lightGray);
+        south.setBackground(color_lavender);
         delPeoContainer.add(south, BorderLayout.SOUTH);
 
         // 탈퇴한 그룹원 이름을 입력 받습니다.
@@ -831,6 +1068,7 @@ public class GUI extends JFrame {
 
         JButton BTN_deleteProcess = new JButton("탈퇴 처리하기");
         BTN_deleteProcess.setSize(30,30);
+        BTN_deleteProcess.setBackground(color_4);
         south.add(BTN_deleteProcess);
 
         // 탈퇴 처리 관련 액션 리스너
@@ -843,7 +1081,7 @@ public class GUI extends JFrame {
                     if (!Objects.equals(personName.getText(), s[0]) && !Objects.equals(personPhone.getText(), s[2]))
                         dummy.add(s);
                 }
-                logic.createMemberInfo3(last_group_name, dummy);
+                logic.createMemberInfo(last_group_name, dummy);
                 deletePeople.dispose();
                 group_modify();
             }
@@ -852,6 +1090,7 @@ public class GUI extends JFrame {
         // 취소 버튼
         JButton BTN_back = new JButton("취소");
         BTN_back.setSize(30,30);
+        BTN_back.setBackground(color_4);
         south.add(BTN_back);
 
         // 취소 관련 액션 리스너
@@ -873,12 +1112,14 @@ public class GUI extends JFrame {
         JFrame deleteCheckFrame = new JFrame();
         deleteCheckFrame.setSize(280, 110);
         deleteCheckFrame.setTitle("그룹 삭제");
+        deleteCheckFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         Container delCheckCon = deleteCheckFrame.getContentPane();
         delCheckCon.setLayout(new BorderLayout());
-        delCheckCon.setBackground(Color.lightGray);
+        delCheckCon.setBackground(color_lavender);
 
         JPanel center = new JPanel();
-        center.setBackground(Color.lightGray);
+        center.setBackground(color_lavender);
         delCheckCon.add(center, BorderLayout.CENTER);
 
         JLabel really = new JLabel("정말 삭제하시겠습니까?");
@@ -888,6 +1129,7 @@ public class GUI extends JFrame {
 
         JButton BTN_yes = new JButton("네");
         BTN_yes.setSize(30, 30);
+        BTN_yes.setBackground(color_4);
         center.add(BTN_yes);
         BTN_yes.addActionListener(new ActionListener() {
             @Override
@@ -901,6 +1143,7 @@ public class GUI extends JFrame {
 
         JButton BTN_no = new JButton("아니오");
         BTN_no.setSize(30, 30);
+        BTN_no.setBackground(color_4);
         center.add(BTN_no);
         BTN_no.addActionListener(new ActionListener() {
             @Override
@@ -914,35 +1157,46 @@ public class GUI extends JFrame {
 
     // 최종 보고서를 출력하는 함수
     public void report_print() {
+        String[][] members = logic.getMemberInfo(last_group_name, header);
+
         JFrame printFrame = new JFrame();
         printFrame.setTitle("최종 보고서 출력");
+        printFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Container printContainer = printFrame.getContentPane();
         printContainer.setLayout(new BorderLayout());
-        printContainer.setBackground(Color.lightGray);
+        printContainer.setBackground(color_lavender);
 
         JPanel north = new JPanel();
-        north.setBackground(Color.lightGray);
+        north.setBackground(color_lavender);
         north.setLayout(new GridLayout(1,4));
         printContainer.add(north, BorderLayout.NORTH);
 
         JPanel center = new JPanel();
-        center.setBackground(Color.lightGray);
+        center.setBackground(color_lavender);
         center.setLayout(new BorderLayout());
         printContainer.add(center, BorderLayout.CENTER);
 
         JPanel center_north = new JPanel();
-        center_north.setBackground(Color.lightGray);
-        center_north.setLayout(new BorderLayout());
+        center_north.setBackground(color_lavender);
+        center_north.setLayout(new FlowLayout());
         center.add(center_north, BorderLayout.NORTH);
 
+        JPanel center_center = new JPanel();
+        center_center.setBackground(color_lavender);
+        center_center.setLayout(new BorderLayout());
+        center.add(center_center, BorderLayout.CENTER);
+
+        JPanel center_south = new JPanel();
+        center_south.setBackground(color_lavender);
+        center_south.setLayout(new FlowLayout());
+        center.add(center_south, BorderLayout.SOUTH);
+
         JPanel south = new JPanel();
-        south.setBackground(Color.lightGray);
+        south.setBackground(color_lavender);
         printContainer.add(south, BorderLayout.SOUTH);
 
         JLabel group_name = new JLabel("그룹이름 : " + last_group_name);
-        group_name.setBackground(Color.white);
-        group_name.setOpaque(true);
         north.add(group_name);
 
         JLabel leader_name = new JLabel("대표자 이름 : " + last_agent_name);
@@ -954,40 +1208,319 @@ public class GUI extends JFrame {
         JLabel endtime = new JLabel("이용 마침 시간 : " + logic.getTimeInfo(last_group_name)[1]);
         north.add(endtime);
 
-        //////////////////////////////////////////////////////////////////////
-        // 현행 규정과 통계 관련해서 코드를 모두 작성하고 변수에 알맞게 대입해주세요.
-        // 모임이 가능한지와 불가능한지 또한 판정하는 코드를 작성 후 변수에 대입해주세요.
-        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-        ///////////////////////////////////////////////////////////////////////
 
-        //아래 str1에 현행 규정 입력하기 <br>은 줄바꿈 문자임
-        String str1 = "================현행규정================<br>"+ "거리두기 ~~단계<br>"+"운영시간 - 제한 없음<br>"+ "테이블간 거리두기 ~~~<br>"+ "최대 ~인 제한<br>";
+        JLabel level = new JLabel("현재 거리두기 단계 : ");
+        center_north.add(level);
 
-        JLabel rule = new JLabel("<HTML><body style ='text-align:center;'>"+str1 +"</body></HTML>",JLabel.CENTER);
-        center_north.add(rule,BorderLayout.NORTH);
+        String[] levels = {"-", "1", "2", "3", "4"};
+        JComboBox<String> CB_level = new JComboBox<>(levels);
+        center_north.add(CB_level);
 
-        //백신 접종 통계를 위해 아래 변수에 수 집어넣기
-        int vaccine_O = 0;
-        int vaccine_X = 0;
-        int negative = 0;
+        JLabel facility = new JLabel("방문 예정 시설 : ");
+        center_north.add(facility);
 
-        JLabel statistics = new JLabel("<HTML><body style ='text-align:center;'>"+"================통계자료================<br>"
-                +"(백신 접종 여부 : O("+vaccine_O+"명), X("+vaccine_X+"명/ 음성확인서 : "+negative+") " +"</body></HTML>", JLabel.CENTER);
-        center_north.add(statistics,BorderLayout.CENTER);
+        String socialDist[] = {"-", "스터디 카페","식당","PC방"};
+        JComboBox<String> facilityShow = new JComboBox<>(socialDist);
+        center_north.add(facilityShow);
+
+
+        JLabel rule = new JLabel("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>",JLabel.CENTER);
+        center_center.add(rule,BorderLayout.NORTH);
 
         // 현행 규정과 비교해서 현재 그룹의 모임이 가능한지 불가능한지를 판정 후 출력
-        String finalJudgement = "※최종 판정 :";
         JLabel judgement = new JLabel(finalJudgement, JLabel.CENTER);
-        center_north.add(judgement,BorderLayout.SOUTH);
+        center_center.add(judgement,BorderLayout.SOUTH);
 
+        CB_level.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                levelName = (String)CB_level.getSelectedItem();
+                if(levelName == "-" || facilityName == "-") {
+                    System.out.println("test");
+                }
+                else if(levelName == "1" && facilityName == "스터디 카페") {
+                    ruleString ="================현행규정================<br>"+ "거리두기 1단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "1" && facilityName == "식당") {
+                    ruleString ="================현행규정================<br>"+ "거리두기 1단계<br>"+"운영시간 - 제한 없음<br>"+ "테이블간 1m 거리두기 또는 좌석/테이블 간 한 칸 띄우기 또는 테이블 간 칸막이 설치<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "1" && facilityName == "PC방") {
+                    ruleString ="================현행규정================<br>"+ "거리두기 1단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "2" && facilityName == "스터디 카페") {
+                    ruleString = "================현행규정================<br>"+ "거리두기 2단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "2" && facilityName == "식당") {
+                    ruleString = "================현행규정================<br>"+ "거리두기 2단계<br>"+"운영시간 - 24시 이후 포장, 배달만 허용<br>"+ "테이블간 1m 거리두기 또는 좌석/테이블 간 한 칸 띄우기 또는 테이블 간 칸막이 설치<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "2" && facilityName == "PC방") {
+                    ruleString ="================현행규정================<br>"+ "거리두기 2단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "3" && facilityName == "스터디 카페") {
+                    ruleString ="================현행규정================<br>"+ "거리두기 3단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "3" && facilityName == "식당") {
+                    ruleString = "================현행규정================<br>"+ "거리두기 3단계<br>"+"운영시간 - 22시 이후 포장, 배달만 허용<br>"+ "테이블간 1m 거리두기 또는 좌석/테이블 간 한 칸 띄우기 또는 테이블 간 칸막이 설치<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "3" && facilityName == "PC방") {
+                    ruleString ="================현행규정================<br>"+ "거리두기 3단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "4" && facilityName == "스터디 카페") {
+                    ruleString = "================현행규정================<br>"+ "거리두기 4단계<br>"+"운영시간 - 22시 이후 운영제한<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "4" && facilityName == "식당") {
+                    ruleString = "================현행규정================<br>"+ "거리두기 4단계<br>"+"운영시간 - 21시 이후 포장, 배달만 허용<br>"+ "테이블간 1m 거리두기 또는 좌석/테이블 간 한 칸 띄우기 또는 테이블 간 칸막이 설치<br>"+ "예방접종 완료자를 추가하는 경우 18시 이후 4인까지 사적 모임 가능<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else {
+                    ruleString ="================현행규정================<br>"+ "거리두기 4단계<br>"+"운영시간 - 22시 이후 운영 제한<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }
+            }
+        });
 
-        // GUI 중앙에 대한 기능입니다. : 그룹원 정보 출력
-        String[][] members = logic.getMemberInfo(last_group_name, header);
+        facilityShow.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                facilityName = (String) facilityShow.getSelectedItem();
+                if(levelName == "-" || facilityName == "-") {
+                    System.out.println("test");
+                }
+                else if(levelName == "1" && facilityName == "스터디 카페") {
+                    ruleString ="================현행규정================<br>"+ "거리두기 1단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "1" && facilityName == "식당") {
+                    ruleString ="================현행규정================<br>"+ "거리두기 1단계<br>"+"운영시간 - 제한 없음<br>"+ "테이블간 1m 거리두기 또는 좌석/테이블 간 한 칸 띄우기 또는 테이블 간 칸막이 설치<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "1" && facilityName == "PC방") {
+                    ruleString ="================현행규정================<br>"+ "거리두기 1단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "2" && facilityName == "스터디 카페") {
+                    ruleString = "================현행규정================<br>"+ "거리두기 2단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "2" && facilityName == "식당") {
+                    ruleString = "================현행규정================<br>"+ "거리두기 2단계<br>"+"운영시간 - 24시 이후 포장, 배달만 허용<br>"+ "테이블간 1m 거리두기 또는 좌석/테이블 간 한 칸 띄우기 또는 테이블 간 칸막이 설치<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "2" && facilityName == "PC방") {
+                    ruleString ="================현행규정================<br>"+ "거리두기 2단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "3" && facilityName == "스터디 카페") {
+                    ruleString ="================현행규정================<br>"+ "거리두기 3단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "3" && facilityName == "식당") {
+                    ruleString = "================현행규정================<br>"+ "거리두기 3단계<br>"+"운영시간 - 22시 이후 포장, 배달만 허용<br>"+ "테이블간 1m 거리두기 또는 좌석/테이블 간 한 칸 띄우기 또는 테이블 간 칸막이 설치<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "3" && facilityName == "PC방") {
+                    ruleString ="================현행규정================<br>"+ "거리두기 3단계<br>"+"운영시간 - 제한 없음<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "4" && facilityName == "스터디 카페") {
+                    ruleString = "================현행규정================<br>"+ "거리두기 4단계<br>"+"운영시간 - 22시 이후 운영제한<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else if(levelName == "4" && facilityName == "식당") {
+                    ruleString = "================현행규정================<br>"+ "거리두기 4단계<br>"+"운영시간 - 21시 이후 포장, 배달만 허용<br>"+ "테이블간 1m 거리두기 또는 좌석/테이블 간 한 칸 띄우기 또는 테이블 간 칸막이 설치<br>"+ "예방접종 완료자를 추가하는 경우 18시 이후 4인까지 사적 모임 가능<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }else {
+                    ruleString ="================현행규정================<br>"+ "거리두기 4단계<br>"+"운영시간 - 22시 이후 운영 제한<br>"+ "좌석 한 칸 띄우기(칸막이 있는 경우 제외)<br>"+ "인원 제한 없음<br>";
+                    rule.setText("<HTML><body style ='text-align:center;'>"+ruleString +"</body></HTML>");
+                    judge = logic.enter_judgement(levelName, facilityName, members, last_group_name);
+                    if(judge) {
+                        finalJudgement = "※최종 판정 : 이용 가능";
+                    }else {
+                        finalJudgement = "※최종 판정 : 이용 불가능";
+                    }
+                    judgement.setText(finalJudgement);
+                }
+            }
+        });
+
+        ////////////////////////////////////////////////////////////////////////////
+        // 백신 접종 관련한 조건문 통해서 변수에 값을 집어넣어 주세요.
+        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
+        ////////////////////////////////////////////////////////////////////////////
+
+        String[] check_list = {"X","O"};
+        int vaccine_O = 0;
+        int negative = 0;
+
+        for(int i = 0; i < members.length; i++) {
+            //check_list 내용에 따라서 변수에 1씩 더하기
+            if (members[i][4].equals("O"))
+                vaccine_O++;
+            else {
+                if (members[i][5].equals("O"))
+                    negative++;
+            }
+        }
+
+        JLabel statistics = new JLabel("<HTML><body style ='text-align:center;'>"+"================통계자료================<br>"
+                +"(백신 접종 여부 : O("+vaccine_O+"명), X("+(members.length - vaccine_O)+"명/ 음성확인서 : "+negative+") " +"</body></HTML>", JLabel.CENTER);
+        center_center.add(statistics,BorderLayout.CENTER);
 
         DefaultTableModel model = new DefaultTableModel(members, header);
         JTable showMembers = new JTable(model);
         showMembers.setPreferredScrollableViewportSize(new Dimension(800, members.length * 17));
-        printFrame.setSize(800,250 + members.length * 17);
+        center_south.setSize(new Dimension(800, (members.length+2) * 17));
+        printFrame.setSize(800,300 + center_south.getHeight());
 
         // 셀 수정을 불가능하게 합니다.
         showMembers.setEnabled(false);
@@ -1014,29 +1547,13 @@ public class GUI extends JFrame {
         showMembers.setRowHeight(17);
 
         JScrollPane print = new JScrollPane(showMembers);
-        print.setPreferredSize(new Dimension(800, members.length * 17));
-        center.add(print);
+        print.setPreferredSize(new Dimension(800, 25 + members.length * 17));
+        center_south.add(print);
 
-
-        // GUI 하단 : 인쇄하기 버튼과 창 닫기 버튼
-        JButton BTN_print = new JButton("인쇄하기");
-        BTN_print.setSize(30,30);
-        south.add(BTN_print);
-
-        BTN_print.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ////////////////////////////////////////////////////////////////////////////
-                // 실제 인쇄 관련한 코드를 작성해주시면 됩니다.
-                // 구글에 Java 인쇄 기능 등의 키워드를 입력 후 검색하시면 관련 코드들 나옵니다.
-                // 해당 코드들 복사한 후 적절하게 수정하여 실행이 되도록 해주시면 됩니다.
-                // 예시 사이트 : https://dinae.tistory.com/24
-                ////////////////////////////////////////////////////////////////////////////
-            }
-        });
 
         JButton BTN_close_print = new JButton("창 닫기");
-        BTN_print.setSize(30,30);
+        BTN_close_print.setSize(30,30);
+        BTN_close_print.setBackground(color_4);
         south.add(BTN_close_print);
 
         BTN_close_print.addActionListener(new ActionListener() {
